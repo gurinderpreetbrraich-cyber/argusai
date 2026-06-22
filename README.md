@@ -29,7 +29,7 @@ Applied to sleep medicine as the primary domain — a high-stakes area where AI 
 
 ## Live Demo
 
-**[argusai-eight.vercel.app](https://argusai-eight.vercel.app)**
+**[argusai-gray.vercel.app](https://argusai-gray.vercel.app)**
 
 Five test cases included:
 - Mild OSA (AHI 18/hr)
