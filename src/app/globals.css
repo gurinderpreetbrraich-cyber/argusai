@@ -1,0 +1,112 @@
+/* ===================================================
+   ArgusAI — Global Design System
+   Palette: Obsidian / Amber / Platinum
+   =================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Core palette */
+  --obsidian:    #0a0b0d;
+  --obsidian-1:  #0f1114;
+  --obsidian-2:  #14171c;
+  --obsidian-3:  #1c2028;
+  --obsidian-4:  #252b35;
+  --obsidian-5:  #2e3542;
+
+  /* Amber — the signature accent */
+  --amber:       #f0a500;
+  --amber-dim:   #c07e00;
+  --amber-glow:  rgba(240, 165, 0, 0.12);
+  --amber-glow2: rgba(240, 165, 0, 0.06);
+
+  /* Text */
+  --text-primary:   #e8eaed;
+  --text-secondary: #8b95a3;
+  --text-tertiary:  #545e6b;
+  --text-amber:     #f0a500;
+
+  /* Semantic */
+  --success:  #22c55e;
+  --warning:  #f59e0b;
+  --danger:   #ef4444;
+  --info:     #3b82f6;
+
+  /* Severity colors */
+  --sev-high:   #ef4444;
+  --sev-medium: #f59e0b;
+  --sev-low:    #22c55e;
+
+  /* Borders */
+  --border:       rgba(255,255,255,0.06);
+  --border-hover: rgba(255,255,255,0.12);
+  --border-amber: rgba(240,165,0,0.3);
+
+  /* Typography */
+  --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Radius */
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--obsidian);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--obsidian-2); }
+::-webkit-scrollbar-thumb { background: var(--obsidian-5); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+/* Selection */
+::selection { background: var(--amber-glow); color: var(--amber); }
+
+/* Utilities */
+.mono { font-family: var(--font-mono); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--obsidian-3) 25%, var(--obsidian-4) 50%, var(--obsidian-3) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: var(--r-sm);
+}
+
+/* Pulse dot */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* Scan line — signature animation */
+@keyframes scan {
+  0%   { transform: translateY(0); opacity: 0.6; }
+  100% { transform: translateY(100%); opacity: 0; }
+}

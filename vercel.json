@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/api/cases",   "destination": "/api/cases.py"   },
+    { "source": "/api/analyze", "destination": "/api/analyze.py" }
+  ],
+  "functions": {
+    "api/analyze.py": { "maxDuration": 30 },
+    "api/cases.py":   { "maxDuration": 10 }
+  }
+}
