@@ -1,0 +1,69 @@
+<svg width="100%" viewBox="0 0 680 520" role="img" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, -apple-system, sans-serif;">
+  <title>ArgusAI architecture diagram</title>
+  <desc>Two-pass Groq pipeline feeding into a Next.js dashboard on Vercel</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="680" height="520" fill="#0d0d0f"/>
+
+  <!-- ── Input: Patient case ── -->
+  <rect x="240" y="20" width="200" height="52" rx="8" fill="#1e1e24" stroke="#3a3a4a" stroke-width="0.5"/>
+  <text font-size="14" font-weight="500" fill="#e2e2e8" x="340" y="42" text-anchor="middle" dominant-baseline="central">Patient case</text>
+  <text font-size="12" fill="#888896" x="340" y="60" text-anchor="middle" dominant-baseline="central">Clinical sleep data prompt</text>
+
+  <!-- Arrow down -->
+  <line x1="340" y1="72" x2="340" y2="106" stroke="#555566" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ── Pass 1: Groq Reasoning ── -->
+  <rect x="160" y="108" width="360" height="72" rx="10" fill="#1e1428" stroke="#7c6fcd" stroke-width="0.5"/>
+  <text font-size="14" font-weight="500" fill="#c4b8f0" x="340" y="132" text-anchor="middle" dominant-baseline="central">Pass 1 — Groq reasoning</text>
+  <text font-size="12" fill="#9b90cc" x="340" y="152" text-anchor="middle" dominant-baseline="central">llama-3.3-70b-versatile · step-by-step clinical reasoning</text>
+  <text font-size="12" fill="#9b90cc" x="340" y="168" text-anchor="middle" dominant-baseline="central">Chain-of-thought extraction · paragraph segmentation</text>
+
+  <!-- Side label -->
+  <text font-size="11" fill="#666677" x="534" y="152" dominant-baseline="central">reasoning_steps[ ]</text>
+
+  <!-- Arrow down -->
+  <line x1="340" y1="180" x2="340" y2="214" stroke="#555566" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ── Pass 2: Groq Analysis ── -->
+  <rect x="160" y="216" width="360" height="72" rx="10" fill="#211a08" stroke="#c49a2a" stroke-width="0.5"/>
+  <text font-size="14" font-weight="500" fill="#f0d890" x="340" y="240" text-anchor="middle" dominant-baseline="central">Pass 2 — Groq analysis</text>
+  <text font-size="12" fill="#c4a860" x="340" y="260" text-anchor="middle" dominant-baseline="central">llama-3.3-70b-versatile · faithfulness scoring</text>
+  <text font-size="12" fill="#c4a860" x="340" y="276" text-anchor="middle" dominant-baseline="central">Anomaly detection · counterfactual probe generation</text>
+
+  <!-- Arrow down -->
+  <line x1="340" y1="288" x2="340" y2="322" stroke="#555566" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ── Dashboard container ── -->
+  <rect x="60" y="324" width="560" height="168" rx="14" fill="#0e1e1a" stroke="#2a6e58" stroke-width="0.5"/>
+  <text font-size="14" font-weight="500" fill="#7ecfb2" x="340" y="350" text-anchor="middle" dominant-baseline="central">ArgusAI dashboard — Next.js 14 on Vercel</text>
+
+  <!-- Inner panel 1: Score rings -->
+  <rect x="80" y="366" width="156" height="100" rx="8" fill="#0a1a15" stroke="#1e5a46" stroke-width="0.5"/>
+  <text font-size="13" font-weight="500" fill="#5cbf9a" x="158" y="390" text-anchor="middle" dominant-baseline="central">Score rings</text>
+  <text font-size="11" fill="#4a9e80" x="158" y="410" text-anchor="middle" dominant-baseline="central">Faithfulness</text>
+  <text font-size="11" fill="#4a9e80" x="158" y="428" text-anchor="middle" dominant-baseline="central">Confidence</text>
+  <text font-size="11" fill="#4a9e80" x="158" y="446" text-anchor="middle" dominant-baseline="central">Verdict</text>
+
+  <!-- Inner panel 2: Reasoning trace -->
+  <rect x="252" y="366" width="176" height="100" rx="8" fill="#0a1a15" stroke="#1e5a46" stroke-width="0.5"/>
+  <text font-size="13" font-weight="500" fill="#5cbf9a" x="340" y="390" text-anchor="middle" dominant-baseline="central">Reasoning trace</text>
+  <text font-size="11" fill="#4a9e80" x="340" y="410" text-anchor="middle" dominant-baseline="central">Step-by-step viewer</text>
+  <text font-size="11" fill="#4a9e80" x="340" y="428" text-anchor="middle" dominant-baseline="central">Anomalous steps</text>
+  <text font-size="11" fill="#4a9e80" x="340" y="446" text-anchor="middle" dominant-baseline="central">highlighted inline</text>
+
+  <!-- Inner panel 3: Probes -->
+  <rect x="444" y="366" width="156" height="100" rx="8" fill="#0a1a15" stroke="#1e5a46" stroke-width="0.5"/>
+  <text font-size="13" font-weight="500" fill="#5cbf9a" x="522" y="390" text-anchor="middle" dominant-baseline="central">Probes</text>
+  <text font-size="11" fill="#4a9e80" x="522" y="410" text-anchor="middle" dominant-baseline="central">Anomaly cards</text>
+  <text font-size="11" fill="#4a9e80" x="522" y="428" text-anchor="middle" dominant-baseline="central">Counterfactual</text>
+  <text font-size="11" fill="#4a9e80" x="522" y="446" text-anchor="middle" dominant-baseline="central">questions</text>
+
+  <!-- Footer label -->
+  <text font-size="11" fill="#444455" x="340" y="506" text-anchor="middle" dominant-baseline="central">argusai-gray.vercel.app</text>
+</svg>
