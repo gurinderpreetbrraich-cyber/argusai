@@ -2,7 +2,7 @@
 
 **LLM Reasoning Oversight — AI Safety Research Project**
 
-[![Live Demo](https://img.shields.io/badge/Demo-argusai--eight.vercel.app-f0a500?style=flat-square&logo=vercel&logoColor=black)](https://argusai-eight.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Demo-argusai--eight.vercel.app-f0a500?style=flat-square&logo=vercel&logoColor=black)](https://argusai-gray.vercel.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-0f1114?style=flat-square)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)](https://nextjs.org)
 [![Python](https://img.shields.io/badge/Python-3.11-3776ab?style=flat-square&logo=python&logoColor=white)](https://python.org)
@@ -29,7 +29,7 @@ Applied to sleep medicine as the primary domain — a high-stakes area where AI 
 
 ## Live Demo
 
-**[argusai-eight.vercel.app](https://argusai-eight.vercel.app)**
+**[argusai-eight.vercel.app](https://argusai-gray.vercel.app)**
 
 Five test cases included:
 - Mild OSA (AHI 18/hr)
