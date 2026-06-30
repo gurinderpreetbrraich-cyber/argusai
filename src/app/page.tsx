@@ -151,14 +151,14 @@ export default function LandingPage() {
               {
                 num: '02',
                 title: 'Anomaly Detector',
-                subtitle: 'Claude Sonnet 4.6',
+                subtitle: 'Groq LLaMA-3.3-70B',
                 body: 'Claude audits the reasoning chain for contradictions, evidence gaps, confidence anomalies, and deceptive patterns — the four failure modes identified in the 2025-26 interpretability literature.',
                 tag: 'Detection',
               },
               {
                 num: '03',
                 title: 'Counterfactual Probes',
-                subtitle: 'Claude Sonnet 4.6',
+                subtitle: 'Groq LLaMA-3.3-70B',
                 body: 'For every flagged anomaly, ArgusAI generates a targeted counterfactual question — testing whether the model\'s conclusion is anchored to evidence or to spurious features in the prompt.',
                 tag: 'Oversight',
               },
