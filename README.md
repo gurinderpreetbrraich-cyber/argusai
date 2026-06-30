@@ -22,13 +22,9 @@ It runs every LLM-generated reasoning chain through a second-pass audit, flaggin
 - 🟡 **Evidence gaps** — critical findings ignored in the final answer
 - 🟠 **Deceptive patterns** — conclusions overridden by prompt framing rather than data
 
-Applied to **sleep medicine** as the primary domain — a field where reasoning failures have direct clinical consequences and the failure modes are easy to construct and verify.
-
 ---
 
-## 🚀 Live Demo
-
-**[argusai-gray.vercel.app](https://argusai-gray.vercel.app)**
+## 🩺 Domain 1 — Clinical (Sleep Medicine)
 
 | Case | Type | Severity |
 |------|------|----------|
@@ -38,7 +34,29 @@ Applied to **sleep medicine** as the primary domain — a field where reasoning 
 | 9M, ADHD, nocturnal thrashing | Pediatric Restless Sleep | 🟢 Mild |
 | 52M, AHI 52/hr, denies symptoms | **Adversarial Case** ⚠️ | 🔴 Critical |
 
-Case 05 is engineered to provoke exactly the failure ArgusAI is built to catch — try it first.
+A faithfulness failure here has direct patient-safety consequences — the highest-stakes proof of concept for the architecture.
+
+## 🔐 Domain 2 — Code Security Review
+
+| Case | Type | Severity |
+|------|------|----------|
+| Parameterized query, bcrypt auth | Clean Auth | 🟢 Mild |
+| Raw string-concatenated SQL query | SQL Injection | 🔴 Severe |
+| Admin check via client-supplied header | Auth Bypass | 🔴 Severe |
+| Unvalidated file upload, no extension check | Unvalidated Upload | 🟡 Moderate |
+| SQLi flagged in reasoning, then approved under deadline pressure | **Adversarial Case** ⚠️ | 🔴 Critical |
+
+Demonstrates the same unfaithfulness pattern in an entirely different domain — proof the architecture generalizes, not a sleep-medicine-specific trick.
+
+Both domains are toggleable live on the dashboard.
+
+---
+
+## 🚀 Live Demo
+
+**[argusai-gray.vercel.app](https://argusai-gray.vercel.app)**
+
+Use the **Clinical / Code Security** toggle at the top of the sidebar to switch domains. The adversarial case in each domain is engineered to provoke exactly the failure ArgusAI is built to catch — try it first.
 
 ---
 
@@ -78,7 +96,9 @@ Patient case
 - **🔍 Reasoning trace** — full step-by-step visualizer with flagged steps highlighted inline
 - **⚠️ Anomaly detection** — contradiction, evidence-gap, and confidence-anomaly classification with severity scoring
 - **❓ Counterfactual probes** — auto-generated questions that interrogate exactly where the reasoning breaks
-- **🧪 Adversarial case** — a deliberately constructed scenario where ground truth (AHI 52/hr) conflicts with patient self-report, used to validate detection works
+- **🔀 Dual-domain architecture** — same pipeline, swappable system prompt, proving the oversight mechanism generalizes across clinical diagnosis and code security review
+- **🧪 Adversarial cases** — deliberately constructed scenarios where ground truth conflicts with framing, used to validate detection works in both domains
+
 
 ---
 
