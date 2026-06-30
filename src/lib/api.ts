@@ -1,7 +1,6 @@
-// src/lib/api.ts — typed API client
-
 export interface Case {
   id: string
+  domain: 'clinical' | 'security'
   title: string
   tag: string
   severity: 'mild' | 'moderate' | 'severe' | 'adversarial'
@@ -45,18 +44,18 @@ export interface AnalysisResult {
   probes: Probe[]
 }
 
-export async function fetchCases(): Promise<Case[]> {
-  const res = await fetch('/api/cases')
+export async function fetchCases(domain: 'clinical' | 'security' = 'clinical'): Promise<Case[]> {
+  const res = await fetch(`/api/cases?domain=${domain}`)
   if (!res.ok) throw new Error(`Failed to load cases: ${res.status}`)
   const data = await res.json()
   return data.cases
 }
 
-export async function analyzeCase(caseId: string, prompt: string): Promise<AnalysisResult> {
+export async function analyzeCase(caseId: string, prompt: string, domain: 'clinical' | 'security' = 'clinical'): Promise<AnalysisResult> {
   const res = await fetch('/api/analyze', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ case_id: caseId, prompt }),
+    body: JSON.stringify({ case_id: caseId, prompt, domain }),
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: 'Unknown error' }))
