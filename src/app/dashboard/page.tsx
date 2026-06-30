@@ -1,4 +1,3 @@
-
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
@@ -17,6 +16,9 @@ const TAG_COLOR: Record<string, string> = {
   Insomnia:   'rgba(168,85,247,0.15)',
   Pediatric:  'rgba(34,197,94,0.15)',
   Adversarial:'rgba(239,68,68,0.15)',
+  Auth:       'rgba(59,130,246,0.15)',
+  Injection:  'rgba(239,68,68,0.15)',
+  Upload:     'rgba(168,85,247,0.15)',
 }
 
 function ScoreRing({ score, size = 72 }: { score: number; size?: number }) {
@@ -69,6 +71,7 @@ function ReasoningTrace({ steps, anomalyStepIds }: { steps: {step_id:number;text
 }
 
 export default function Dashboard() {
+  const [domain, setDomain] = useState<'clinical' | 'security'>('clinical')
   const [cases, setCases] = useState<Case[]>([])
   const [selected, setSelected] = useState<Case | null>(null)
   const [result, setResult] = useState<AnalysisResult | null>(null)
@@ -79,10 +82,14 @@ export default function Dashboard() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
-    fetchCases()
+    setCases([])
+    setSelected(null)
+    setResult(null)
+    setError(null)
+    fetchCases(domain)
       .then(c => { setCases(c); setSelected(c[0]) })
       .catch(() => setError('Failed to load cases. Refresh the page.'))
-  }, [])
+  }, [domain])
 
   const handleAnalyze = async () => {
     if (!selected) return
@@ -95,7 +102,7 @@ export default function Dashboard() {
     timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000)
 
     try {
-      const r = await analyzeCase(selected.id, selected.prompt)
+      const r = await analyzeCase(selected.id, selected.prompt, domain)
       setResult(r)
     } catch (e: any) {
       setError(e.message || 'Analysis failed. Please retry.')
@@ -106,6 +113,7 @@ export default function Dashboard() {
   }
 
   const anomalyStepIds = new Set(result?.anomalies.map(a => a.step_id) ?? [])
+  const caseLabel = domain === 'security' ? 'Pull Request' : 'Patient Case'
 
   return (
     <div className={styles.root}>
@@ -128,9 +136,35 @@ export default function Dashboard() {
       <div className={styles.layout}>
         {/* ── Sidebar: case selector ── */}
         <aside className={styles.sidebar}>
-          <div className={styles.sidebarHeader}>
-            <span className={styles.sidebarLabel}>Test Cases</span>
-            <span className={styles.sidebarCount}>{cases.length}</span>
+          <div className={styles.sidebarHeader} style={{ flexDirection: 'column', alignItems: 'stretch', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span className={styles.sidebarLabel}>Test Cases</span>
+              <span className={styles.sidebarCount}>{cases.length}</span>
+            </div>
+            <div style={{ display: 'flex', gap: '0.4rem' }}>
+              <button
+                onClick={() => setDomain('clinical')}
+                style={{
+                  flex: 1, padding: '0.4rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem',
+                  fontWeight: 600, cursor: 'pointer', border: '1px solid rgba(255,255,255,0.1)',
+                  background: domain === 'clinical' ? 'rgba(240,165,0,0.15)' : 'transparent',
+                  color: domain === 'clinical' ? '#f0a500' : 'rgba(255,255,255,0.5)',
+                }}
+              >
+                Clinical
+              </button>
+              <button
+                onClick={() => setDomain('security')}
+                style={{
+                  flex: 1, padding: '0.4rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem',
+                  fontWeight: 600, cursor: 'pointer', border: '1px solid rgba(255,255,255,0.1)',
+                  background: domain === 'security' ? 'rgba(240,165,0,0.15)' : 'transparent',
+                  color: domain === 'security' ? '#f0a500' : 'rgba(255,255,255,0.5)',
+                }}
+              >
+                Code Security
+              </button>
+            </div>
           </div>
 
           {cases.length === 0 ? (
@@ -166,7 +200,7 @@ export default function Dashboard() {
             <div className={styles.promptCard}>
               <div className={styles.promptHeader}>
                 <div>
-                  <span className={styles.promptLabel}>Patient Case</span>
+                  <span className={styles.promptLabel}>{caseLabel}</span>
                   <h2 className={styles.promptTitle}>{selected.title}</h2>
                 </div>
                 <button
@@ -189,7 +223,9 @@ export default function Dashboard() {
                   )}
                 </button>
               </div>
-              <p className={styles.promptText}>{selected.prompt}</p>
+              <p className={styles.promptText} style={{ whiteSpace: 'pre-wrap', fontFamily: domain === 'security' ? 'JetBrains Mono, monospace' : 'inherit' }}>
+                {selected.prompt}
+              </p>
             </div>
           )}
 
