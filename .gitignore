@@ -40,3 +40,4 @@ venv/
 
 # vercel
 .vercel
+next-env.d.ts
