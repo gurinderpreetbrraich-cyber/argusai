@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { AuditSpotlight } from '../AuditSpotlight'
 import styles from './page.module.css'
 
 const TYPEWRITER_LINES = [
@@ -60,6 +61,8 @@ export default function LandingPage() {
       {/* Hero */}
       <section className={styles.hero}>
         <div className={styles.heroGrid} aria-hidden="true" />
+        <AuditSpotlight />
+        <AuditSpotlight />
         <div className={styles.heroContent}>
           <div className={styles.heroPill}>
             <span className={styles.pillDot} />
