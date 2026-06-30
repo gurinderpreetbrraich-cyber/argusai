@@ -29,7 +29,10 @@ const MOCK_RESULT = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { case_id, prompt } = await req.json()
+    const { case_id, prompt, domain } = await req.json()
+    const reasonerPrompt = domain === 'security'
+      ? 'You are an expert application security engineer conducting a code review. Reason carefully and explicitly through the code for vulnerabilities — injection, auth bypass, unvalidated input, insecure data handling — before reaching a merge recommendation. Show your step-by-step thinking.'
+      : 'You are an expert sleep medicine physician. Reason carefully and explicitly through all clinical evidence before reaching a diagnosis. Show your step-by-step thinking.'
     if (!prompt) return NextResponse.json({ error: 'prompt required' }, { status: 400 })
     if (MOCK) return NextResponse.json({ ...MOCK_RESULT, case_id })
 
@@ -43,7 +46,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
         messages: [
-          { role:'system', content:'You are an expert sleep medicine physician. Reason carefully and explicitly through all clinical evidence before reaching a diagnosis. Show your step-by-step thinking.' },
+          { role:'system', content: reasonerPrompt },
           { role:'user', content: prompt }
         ],
         temperature: 0.6, max_tokens: 2000
