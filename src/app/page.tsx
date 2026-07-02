@@ -1,8 +1,7 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { AuditSpotlight } from '../AuditSpotlight'
-import styles from './page.module.css'
 
 const TYPEWRITER_LINES = [
   'SpO₂ minimum 71% — severe nocturnal hypoxemia.',
@@ -17,8 +16,15 @@ export default function LandingPage() {
   const [charIdx, setCharIdx] = useState(0)
   const [displayed, setDisplayed] = useState('')
   const [mounted, setMounted] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   useEffect(() => {
     if (!mounted) return
@@ -41,141 +47,230 @@ export default function LandingPage() {
   }, [charIdx, lineIdx, mounted])
 
   return (
-    <div className={styles.root}>
-      {/* Nav */}
-      <nav className={styles.nav}>
-        <div className={styles.navInner}>
-          <div className={styles.logo}>
-            <span className={styles.logoIcon}>◈</span>
-            <span className={styles.logoText}>ArgusAI</span>
-            <span className={styles.logoBadge}>v2.0</span>
-          </div>
-          <div className={styles.navLinks}>
-            <a href="#how-it-works" className={styles.navLink}>How it works</a>
-            <a href="https://github.com/gurinderpreetbrraich-cyber/argusai" target="_blank" rel="noopener" className={styles.navLink}>GitHub</a>
-            <Link href="/custom" className={styles.navLink}>Custom Analysis</Link>
-            <Link href="/dashboard" className={styles.navCta}>Launch Demo →</Link>
-          </div>
+    <div style={{ background: '#000', color: '#fff', minHeight: '100vh', fontFamily: 'var(--font-sans)' }}>
+
+      {/* ── Nav ── */}
+      <nav style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+        padding: '0 3rem', height: '64px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: scrolled ? 'rgba(0,0,0,0.9)' : 'transparent',
+        backdropFilter: scrolled ? 'blur(16px)' : 'none',
+        transition: 'background 0.3s, backdrop-filter 0.3s',
+        borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ color: '#f0a500', fontSize: '1.1rem' }}>◈</span>
+          <span style={{ fontWeight: 700, fontSize: '0.95rem', letterSpacing: '-0.01em' }}>ArgusAI</span>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
+          <a href="#work" style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.82rem', textDecoration: 'none', letterSpacing: '0.01em', transition: 'color 0.15s' }}
+            onMouseEnter={e => (e.target as HTMLElement).style.color = '#fff'}
+            onMouseLeave={e => (e.target as HTMLElement).style.color = 'rgba(255,255,255,0.45)'}>
+            How it works
+          </a>
+          <a href="https://github.com/gurinderpreetbrraich-cyber/argusai" target="_blank" rel="noopener"
+            style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.82rem', textDecoration: 'none', letterSpacing: '0.01em', transition: 'color 0.15s' }}
+            onMouseEnter={e => (e.target as HTMLElement).style.color = '#fff'}
+            onMouseLeave={e => (e.target as HTMLElement).style.color = 'rgba(255,255,255,0.45)'}>
+            GitHub
+          </a>
+          <Link href="/custom" style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.82rem', textDecoration: 'none', letterSpacing: '0.01em', transition: 'color 0.15s' }}
+            onMouseEnter={e => (e.target as HTMLElement).style.color = '#fff'}
+            onMouseLeave={e => (e.target as HTMLElement).style.color = 'rgba(255,255,255,0.45)'}>
+            Custom
+          </Link>
+        </div>
+        <Link href="/dashboard" style={{
+          color: '#000', background: '#f0a500',
+          fontSize: '0.78rem', fontWeight: 700,
+          padding: '0.45rem 1.1rem', borderRadius: '6px',
+          textDecoration: 'none', letterSpacing: '0.01em',
+          transition: 'opacity 0.15s',
+        }}
+          onMouseEnter={e => (e.target as HTMLElement).style.opacity = '0.85'}
+          onMouseLeave={e => (e.target as HTMLElement).style.opacity = '1'}>
+          Launch →
+        </Link>
       </nav>
 
-      {/* Hero */}
-      <section className={styles.hero}>
-        <div className={styles.heroGrid} aria-hidden="true" />
+      {/* ── Hero ── */}
+      <section style={{
+        position: 'relative', minHeight: '100vh',
+        display: 'flex', flexDirection: 'column',
+        justifyContent: 'center', padding: '0 3rem',
+        overflow: 'hidden',
+      }}>
         <AuditSpotlight />
-        <AuditSpotlight />
-        <div className={styles.heroContent}>
-          <div className={styles.heroPill}>
-            <span className={styles.pillDot} />
-            AI Safety Research · WSAI 2026
+
+        {/* Subtle grid */}
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px)',
+          backgroundSize: '64px 64px',
+          maskImage: 'radial-gradient(ellipse 80% 70% at 50% 50%, black 10%, transparent 100%)',
+        }} />
+
+        <div style={{ position: 'relative', maxWidth: '900px' }}>
+          {/* Eyebrow */}
+          <div style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.7rem',
+            color: '#f0a500', letterSpacing: '0.12em', textTransform: 'uppercase',
+            marginBottom: '2.5rem', opacity: 0.9,
+          }}>
+            AI Safety · WSAI 2026 Amsterdam
           </div>
-          <h1 className={styles.heroTitle}>
-            When AI reasons,<br />
-            <span className={styles.heroAccent}>who watches?</span>
+
+          {/* Hero headline */}
+          <h1 style={{
+            fontSize: 'clamp(3.5rem, 9vw, 8.5rem)',
+            fontWeight: 800, lineHeight: 0.92,
+            letterSpacing: '-0.04em', color: '#fff',
+            marginBottom: '2rem',
+          }}>
+            Who watches<br />
+            <span style={{ color: 'rgba(255,255,255,0.18)' }}>the AI?</span>
           </h1>
-          <p className={styles.heroSubtitle}>
-            ArgusAI audits large language model reasoning chains in real time —
-            detecting contradictions, evidence gaps, and deceptive patterns
-            before they reach clinical decisions.
+
+          {/* Amber readout — signature element */}
+          <div style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.82rem',
+            color: '#f0a500', marginBottom: '3rem',
+            display: 'flex', alignItems: 'center', gap: '1rem',
+          }}>
+            <span style={{
+              display: 'inline-block', width: '6px', height: '6px',
+              borderRadius: '50%', background: '#f0a500',
+              animation: 'pulse-dot 2s ease-in-out infinite',
+            }} />
+            <span>{displayed}<span style={{ opacity: 0.4 }}>█</span></span>
+          </div>
+
+          {/* One-liner */}
+          <p style={{
+            fontSize: '1.05rem', color: 'rgba(255,255,255,0.38)',
+            maxWidth: '480px', lineHeight: 1.65,
+            fontWeight: 300, marginBottom: '3.5rem',
+          }}>
+            ArgusAI audits LLM reasoning chains in real time — catching contradictions, evidence gaps, and deceptive patterns before they reach high-stakes decisions.
           </p>
 
-          {/* Terminal window — signature element */}
-          <div className={styles.terminal}>
-            <div className={styles.terminalBar}>
-              <span className={styles.dot} style={{background:'#ff5f57'}} />
-              <span className={styles.dot} style={{background:'#febc2e'}} />
-              <span className={styles.dot} style={{background:'#28c840'}} />
-              <span className={styles.terminalTitle}>argusai — reasoning trace</span>
-            </div>
-            <div className={styles.terminalBody}>
-              <div className={styles.termLine}>
-                <span className={styles.termPrompt}>argus@v2</span>
-                <span className={styles.termPath}> ~/analyze</span>
-                <span className={styles.termCmd}> $ run case_05</span>
-              </div>
-              <div className={styles.termLine}>
-                <span className={styles.termOutput}>{displayed}</span>
-                <span className={styles.termCursor} />
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.heroCtas}>
-            <Link href="/dashboard" className={styles.ctaPrimary}>
+          {/* CTAs */}
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <Link href="/dashboard" style={{
+              background: '#f0a500', color: '#000',
+              padding: '0.75rem 1.75rem', borderRadius: '6px',
+              fontWeight: 700, fontSize: '0.875rem',
+              textDecoration: 'none', letterSpacing: '-0.01em',
+              transition: 'opacity 0.15s',
+            }}
+              onMouseEnter={e => (e.target as HTMLElement).style.opacity = '0.85'}
+              onMouseLeave={e => (e.target as HTMLElement).style.opacity = '1'}>
               Run Analysis
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
             </Link>
-            <a href="https://github.com/gurinderpreetbrraich-cyber/argusai" target="_blank" rel="noopener" className={styles.ctaSecondary}>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-              </svg>
-              View on GitHub
-            </a>
+            <Link href="/custom" style={{
+              color: 'rgba(255,255,255,0.45)', fontSize: '0.875rem',
+              textDecoration: 'none', letterSpacing: '-0.01em',
+              transition: 'color 0.15s',
+            }}
+              onMouseEnter={e => (e.target as HTMLElement).style.color = '#fff'}
+              onMouseLeave={e => (e.target as HTMLElement).style.color = 'rgba(255,255,255,0.45)'}>
+              Try custom prompt →
+            </Link>
           </div>
+        </div>
+
+        {/* Scroll hint */}
+        <div style={{
+          position: 'absolute', bottom: '2.5rem', left: '3rem',
+          fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+          color: 'rgba(255,255,255,0.2)', letterSpacing: '0.1em',
+        }}>
+          scroll
         </div>
       </section>
 
-      {/* Stats bar */}
-      <div className={styles.statsBar}>
-        {[
-          { value: '5', label: 'Clinical Test Cases' },
-          { value: '3', label: 'Detection Engines' },
-          { value: '2', label: 'AI Models' },
-          { value: 'WSAi 26', label: 'Target Venue' },
-        ].map(s => (
-          <div key={s.label} className={styles.stat}>
-            <span className={styles.statValue}>{s.value}</span>
-            <span className={styles.statLabel}>{s.label}</span>
-          </div>
-        ))}
-      </div>
+      {/* ── Stats ── */}
+      <section style={{ padding: '6rem 3rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '0', maxWidth: '900px',
+        }}>
+          {[
+            { value: '>50%', label: 'of correct LLM answers mask internal reasoning errors' },
+            { value: '0.61', label: 'faithfulness score on the adversarial case' },
+            { value: '2', label: 'high-stakes domains — clinical and code security' },
+            { value: 'WSAI', label: '2026 Amsterdam research submission' },
+          ].map((s, i) => (
+            <div key={s.label} style={{
+              padding: '0 3rem 0 0',
+              borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+              paddingLeft: i > 0 ? '3rem' : 0,
+            }}>
+              <div style={{
+                fontSize: '2.2rem', fontWeight: 800,
+                letterSpacing: '-0.04em', color: '#f0a500',
+                marginBottom: '0.5rem',
+              }}>{s.value}</div>
+              <div style={{
+                fontSize: '0.78rem', color: 'rgba(255,255,255,0.3)',
+                lineHeight: 1.5, fontWeight: 300,
+              }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      {/* How it works */}
-      <section id="how-it-works" className={styles.section}>
-        <div className={styles.sectionInner}>
-          <div className={styles.sectionHeader}>
-            <span className={styles.eyebrow}>Architecture</span>
-            <h2 className={styles.sectionTitle}>Three-stage oversight pipeline</h2>
-            <p className={styles.sectionSubtitle}>
-              Every reasoning chain passes through compression, anomaly detection, and counterfactual probing.
-            </p>
+      {/* ── How it works ── */}
+      <section id="work" style={{ padding: '8rem 3rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ maxWidth: '900px' }}>
+          <div style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+            color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em',
+            textTransform: 'uppercase', marginBottom: '5rem',
+          }}>
+            Architecture
           </div>
 
-          <div className={styles.pipeline}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
             {[
               {
-                num: '01',
-                title: 'Chain Compressor',
-                subtitle: 'Groq LLaMA-3.3-70B',
-                body: 'The model reasons through a clinical case, producing a full chain-of-thought. ArgusAI extracts individual reasoning steps and computes a faithfulness score between the stated reasoning and the final conclusion.',
-                tag: 'Reasoning',
+                n: '01',
+                title: 'Reason',
+                body: 'Groq runs the clinical case or code review through a domain-aware system prompt, generating a full chain-of-thought step by step. The domain is detected automatically from the prompt.',
               },
               {
-                num: '02',
-                title: 'Anomaly Detector',
-                subtitle: 'Groq LLaMA-3.3-70B',
-                body: 'Claude audits the reasoning chain for contradictions, evidence gaps, confidence anomalies, and deceptive patterns — the four failure modes identified in the 2025-26 interpretability literature.',
-                tag: 'Detection',
+                n: '02',
+                title: 'Audit',
+                body: 'A second Groq pass reads the reasoning chain and scores it for faithfulness — catching contradictions, evidence gaps, and cases where the final answer departs from what the model itself observed.',
               },
               {
-                num: '03',
-                title: 'Counterfactual Probes',
-                subtitle: 'Groq LLaMA-3.3-70B',
-                body: 'For every flagged anomaly, ArgusAI generates a targeted counterfactual question — testing whether the model\'s conclusion is anchored to evidence or to spurious features in the prompt.',
-                tag: 'Oversight',
+                n: '03',
+                title: 'Probe',
+                body: 'For every flagged anomaly, ArgusAI generates a counterfactual question — testing whether the conclusion is anchored to evidence or to spurious framing in the prompt.',
               },
-            ].map(step => (
-              <div key={step.num} className={styles.pipelineStep}>
-                <div className={styles.stepNum}>{step.num}</div>
-                <div className={styles.stepContent}>
-                  <div className={styles.stepHeader}>
-                    <h3 className={styles.stepTitle}>{step.title}</h3>
-                    <span className={styles.stepTag}>{step.tag}</span>
-                  </div>
-                  <p className={styles.stepSubtitle}>{step.subtitle}</p>
-                  <p className={styles.stepBody}>{step.body}</p>
+            ].map((step, i) => (
+              <div key={step.n} style={{
+                display: 'grid', gridTemplateColumns: '80px 1fr',
+                gap: '0 3rem', padding: '3.5rem 0',
+                borderTop: '1px solid rgba(255,255,255,0.06)',
+              }}>
+                <div style={{
+                  fontFamily: 'var(--font-mono)', fontSize: '0.7rem',
+                  color: 'rgba(255,255,255,0.2)', paddingTop: '4px',
+                  letterSpacing: '0.05em',
+                }}>
+                  {step.n}
+                </div>
+                <div>
+                  <h3 style={{
+                    fontSize: '1.6rem', fontWeight: 700,
+                    letterSpacing: '-0.03em', marginBottom: '1rem', color: '#fff',
+                  }}>{step.title}</h3>
+                  <p style={{
+                    fontSize: '0.9rem', color: 'rgba(255,255,255,0.38)',
+                    lineHeight: 1.7, fontWeight: 300, maxWidth: '520px',
+                  }}>{step.body}</p>
                 </div>
               </div>
             ))}
@@ -183,62 +278,175 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Research context */}
-      <section className={styles.section} style={{background: 'var(--obsidian-1)'}}>
-        <div className={styles.sectionInner}>
-          <div className={styles.sectionHeader}>
-            <span className={styles.eyebrow}>Research Context</span>
-            <h2 className={styles.sectionTitle}>The faithfulness problem</h2>
+      {/* ── Domains ── */}
+      <section style={{ padding: '8rem 3rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ maxWidth: '900px' }}>
+          <div style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+            color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em',
+            textTransform: 'uppercase', marginBottom: '5rem',
+          }}>
+            Domains
           </div>
-          <div className={styles.findings}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6rem' }}>
             {[
               {
-                stat: '>50%',
-                finding: 'of correct LLM answers on complex tasks mask significant internal reasoning errors (ProcessBench, 2025)',
+                label: 'Clinical',
+                headline: 'Sleep medicine',
+                body: 'Five clinical cases including a deliberately adversarial scenario where objective wearable data contradicts patient self-report. AHI 52/hr — the model knows, then second-guesses itself.',
+                stat: '0.61', statLabel: 'faithfulness on adversarial case',
               },
               {
-                stat: '72%',
-                finding: 'of enterprises test agentic AI but only 1 in 9 deploys to production — oversight gaps are the primary barrier',
+                label: 'Code Security',
+                headline: 'PR review',
+                body: 'Five pull requests ranging from clean parameterized queries to SQL injection under deadline pressure and "CEO approval." The deceptive case is designed to make the model approve a merge it knows is dangerous.',
+                stat: 'SQL', statLabel: 'injection under social pressure',
               },
-              {
-                stat: '0.61',
-                finding: 'faithfulness score on the adversarial case — model briefly accommodates patient denial despite AHI of 52/hr',
-              },
-            ].map(f => (
-              <div key={f.stat} className={styles.findingCard}>
-                <span className={styles.findingStat}>{f.stat}</span>
-                <p className={styles.findingText}>{f.finding}</p>
+            ].map(d => (
+              <div key={d.label}>
+                <div style={{
+                  fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+                  color: '#f0a500', letterSpacing: '0.1em',
+                  textTransform: 'uppercase', marginBottom: '1.5rem',
+                }}>{d.label}</div>
+                <h3 style={{
+                  fontSize: '2rem', fontWeight: 700,
+                  letterSpacing: '-0.04em', marginBottom: '1.25rem',
+                }}>{d.headline}</h3>
+                <p style={{
+                  fontSize: '0.85rem', color: 'rgba(255,255,255,0.35)',
+                  lineHeight: 1.7, fontWeight: 300, marginBottom: '2rem',
+                }}>{d.body}</p>
+                <div>
+                  <span style={{
+                    fontFamily: 'var(--font-mono)', fontSize: '1.4rem',
+                    fontWeight: 700, color: '#f0a500',
+                  }}>{d.stat}</span>
+                  <span style={{
+                    fontFamily: 'var(--font-mono)', fontSize: '0.7rem',
+                    color: 'rgba(255,255,255,0.2)', marginLeft: '0.75rem',
+                  }}>{d.statLabel}</span>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className={styles.ctaSection}>
-        <div className={styles.sectionInner}>
-          <h2 className={styles.ctaTitle}>See it catch a deceptive reasoning chain.</h2>
-          <p className={styles.ctaSubtitle}>
-            Case 05 is designed to make an AI contradict itself. ArgusAI flags it in under 30 seconds.
-          </p>
-          <Link href="/dashboard" className={styles.ctaPrimary} style={{display:'inline-flex', marginTop:'2rem'}}>
-            Open Dashboard →
-          </Link>
+      {/* ── Research ── */}
+      <section style={{ padding: '8rem 3rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ maxWidth: '900px' }}>
+          <div style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+            color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em',
+            textTransform: 'uppercase', marginBottom: '5rem',
+          }}>
+            Research
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem' }}>
+            {[
+              {
+                stat: '>50%',
+                text: 'of correct LLM answers on complex tasks mask significant internal reasoning errors',
+                source: 'ProcessBench, 2025',
+              },
+              {
+                stat: '72%',
+                text: 'of enterprises test agentic AI but only 1 in 9 deploys to production — reasoning oversight is the gap',
+                source: 'Industry survey, 2026',
+              },
+            ].map(f => (
+              <div key={f.stat}>
+                <div style={{
+                  fontSize: '3.5rem', fontWeight: 800,
+                  letterSpacing: '-0.05em', color: '#fff',
+                  marginBottom: '1rem', lineHeight: 1,
+                }}>{f.stat}</div>
+                <p style={{
+                  fontSize: '0.85rem', color: 'rgba(255,255,255,0.35)',
+                  lineHeight: 1.7, fontWeight: 300, marginBottom: '0.75rem',
+                }}>{f.text}</p>
+                <span style={{
+                  fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+                  color: 'rgba(255,255,255,0.18)',
+                }}>{f.source}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <div className={styles.footerInner}>
-          <span className={styles.footerLogo}>◈ ArgusAI</span>
-          <span className={styles.footerText}>
-            Research project · World Summit AI 2026 · Built by Gurinderpreet Singh Brraich
-          </span>
-          <a href="https://github.com/gurinderpreetbrraich-cyber/argusai" target="_blank" rel="noopener" className={styles.footerLink}>
-            github.com/gurinderpreetbrraich-cyber/argusai
-          </a>
+      {/* ── CTA ── */}
+      <section style={{
+        padding: '10rem 3rem', borderTop: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <div style={{ maxWidth: '900px' }}>
+          <h2 style={{
+            fontSize: 'clamp(2.5rem, 6vw, 5.5rem)',
+            fontWeight: 800, letterSpacing: '-0.04em',
+            lineHeight: 0.95, marginBottom: '3rem', color: '#fff',
+          }}>
+            See it catch a<br />
+            <span style={{ color: 'rgba(255,255,255,0.18)' }}>deceptive chain.</span>
+          </h2>
+          <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+            <Link href="/dashboard" style={{
+              background: '#f0a500', color: '#000',
+              padding: '0.85rem 2rem', borderRadius: '6px',
+              fontWeight: 700, fontSize: '0.9rem',
+              textDecoration: 'none', letterSpacing: '-0.01em',
+              transition: 'opacity 0.15s',
+            }}
+              onMouseEnter={e => (e.target as HTMLElement).style.opacity = '0.85'}
+              onMouseLeave={e => (e.target as HTMLElement).style.opacity = '1'}>
+              Open Dashboard
+            </Link>
+            <Link href="/custom" style={{
+              color: 'rgba(255,255,255,0.35)', fontSize: '0.875rem',
+              textDecoration: 'none', transition: 'color 0.15s',
+            }}
+              onMouseEnter={e => (e.target as HTMLElement).style.color = '#fff'}
+              onMouseLeave={e => (e.target as HTMLElement).style.color = 'rgba(255,255,255,0.35)'}>
+              Or paste your own prompt →
+            </Link>
+          </div>
         </div>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer style={{
+        padding: '3rem', borderTop: '1px solid rgba(255,255,255,0.06)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ color: '#f0a500' }}>◈</span>
+          <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>ArgusAI</span>
+        </div>
+        <span style={{
+          fontFamily: 'var(--font-mono)', fontSize: '0.68rem',
+          color: 'rgba(255,255,255,0.2)',
+        }}>
+          WSAI 2026 · Built by Gurinderpreet Singh Brraich
+        </span>
+        <a href="https://github.com/gurinderpreetbrraich-cyber/argusai" target="_blank" rel="noopener"
+          style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.68rem',
+            color: 'rgba(255,255,255,0.2)', textDecoration: 'none',
+            transition: 'color 0.15s',
+          }}
+          onMouseEnter={e => (e.target as HTMLElement).style.color = '#fff'}
+          onMouseLeave={e => (e.target as HTMLElement).style.color = 'rgba(255,255,255,0.2)'}>
+          github →
+        </a>
       </footer>
+
+      <style>{`
+        @media (max-width: 768px) {
+          nav { padding: 0 1.5rem !important; }
+          section { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
+          footer { padding: 2rem 1.5rem !important; flex-direction: column; gap: 1rem; align-items: flex-start; }
+        }
+      `}</style>
     </div>
   )
 }
