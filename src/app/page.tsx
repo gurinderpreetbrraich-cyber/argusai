@@ -53,6 +53,7 @@ export default function LandingPage() {
           <div className={styles.navLinks}>
             <a href="#how-it-works" className={styles.navLink}>How it works</a>
             <a href="https://github.com/gurinderpreetbrraich-cyber/argusai" target="_blank" rel="noopener" className={styles.navLink}>GitHub</a>
+            <Link href="/custom" className={styles.navLink}>Custom Analysis</Link>
             <Link href="/dashboard" className={styles.navCta}>Launch Demo →</Link>
           </div>
         </div>
