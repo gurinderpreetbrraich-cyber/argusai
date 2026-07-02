@@ -1,454 +1,300 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
-type CharKey = 'clinical' | 'security' | 'custom' | 'research'
-
-interface CharDef {
-  key: CharKey
-  accent: string
-  accentGlow: string
-  label: string
-  sub: string
-  href: string
-  meta: { k: string; v: string }[]
-  desc: string
-}
-
-const CHARACTERS: CharDef[] = [
+const CARDS = [
   {
-    key: 'clinical',
+    id: 'clinical',
+    label: 'no cap,',
+    sublabel: "it's sick",
+    sub: 'Clinical Analysis',
+    desc: 'Watch an AI diagnose severe sleep apnea — then talk itself out of it.',
+    href: '/dashboard',
     accent: '#f0a500',
-    accentGlow: 'rgba(240,165,0,0.16)',
-    label: 'Clinical',
-    sub: 'diagnosis versus objective data',
-    href: '/dashboard?domain=clinical',
-    desc: 'Five cases built on real wearable telemetry. Case 5 is adversarial by design \u2014 SpO\u2082 minimum 71%, AHI 52, and a patient who insists nothing is wrong. ArgusAI evaluates whether the diagnosis follows the data or the narrative.',
-    meta: [
-      { k: 'domain', v: 'sleep medicine' },
-      { k: 'cases', v: '5' },
-      { k: 'model', v: 'llama-3.3-70b' },
-      { k: 'adversarial', v: 'case_05' },
-    ],
+    emoji: '🩺',
+    rotate: -4,
+    x: -2,
+    y: -1,
   },
   {
-    key: 'security',
-    accent: '#ef4444',
-    accentGlow: 'rgba(239,68,68,0.16)',
-    label: 'Code security',
-    sub: 'a vulnerability, identified then dismissed',
+    id: 'security',
+    label: 'bro just',
+    sublabel: 'merged it',
+    sub: 'Code Security',
+    desc: 'SQL injection, deadline pressure, CEO approved. What could go wrong.',
     href: '/dashboard?domain=security',
-    desc: 'The model identifies a SQL injection vulnerability in its own reasoning, then reverses its recommendation under social and time pressure \u2014 a clear instance of reasoning that doesn\u2019t survive contact with framing.',
-    meta: [
-      { k: 'domain', v: 'code review' },
-      { k: 'cases', v: '5' },
-      { k: 'model', v: 'llama-3.3-70b' },
-      { k: 'adversarial', v: 'sec_05' },
-    ],
+    accent: '#ef4444',
+    emoji: '💀',
+    rotate: 3,
+    x: 1,
+    y: -2,
   },
   {
-    key: 'custom',
-    accent: '#a855f7',
-    accentGlow: 'rgba(168,85,247,0.16)',
-    label: 'Custom prompt',
-    sub: 'analyze any reasoning chain',
+    id: 'custom',
+    label: 'go',
+    sublabel: 'off',
+    sub: 'Custom Prompt',
+    desc: 'Paste literally anything. ArgusAI will find the contradiction.',
     href: '/custom',
-    desc: 'Paste a diagnosis, a code review, an argument \u2014 anything with a stated conclusion. ArgusAI detects the domain automatically and audits the reasoning behind it.',
-    meta: [
-      { k: 'domain', v: 'auto-detected' },
-      { k: 'input', v: 'any prompt' },
-      { k: 'model', v: 'llama-3.3-70b' },
-      { k: 'mode', v: 'live' },
-    ],
+    accent: '#a855f7',
+    emoji: '⚡',
+    rotate: -2,
+    x: -1,
+    y: 1,
   },
   {
-    key: 'research',
-    accent: '#22c55e',
-    accentGlow: 'rgba(34,197,94,0.16)',
-    label: 'Research',
-    sub: 'the study behind the system',
+    id: 'research',
+    label: 'the',
+    sublabel: 'lore',
+    sub: 'Research · WSAI 2026',
+    desc: '>50% of correct LLM answers mask internal reasoning errors. We wrote about it.',
     href: 'https://github.com/gurinderpreetbrraich-cyber/argusai',
-    desc: 'More than half of correct LLM answers on complex tasks conceal flawed reasoning underneath (ProcessBench, 2025). This is a WSAI 2026 submission built to make that failure mode visible and measurable.',
-    meta: [
-      { k: 'target', v: 'WSAI 2026' },
-      { k: 'track', v: 'AI safety' },
-      { k: 'status', v: 'submitted' },
-      { k: 'repo', v: 'public' },
-    ],
+    accent: '#22c55e',
+    emoji: '📄',
+    rotate: 5,
+    x: 2,
+    y: 2,
   },
 ]
 
-const STEPS = [
-  {
-    n: '01',
-    title: 'Reason',
-    desc: 'The model reasons through the case step by step using Groq\u2019s llama-3.3-70b, and every step of that process is recorded \u2014 not only the final answer.',
-  },
-  {
-    n: '02',
-    title: 'Audit',
-    desc: 'A second pass reviews the first for faithfulness: does each step support the next, and does the conclusion actually follow from the evidence presented?',
-  },
-  {
-    n: '03',
-    title: 'Probe',
-    desc: 'For each anomaly detected, ArgusAI generates a counterfactual question designed to test whether the reasoning would hold up under scrutiny.',
-  },
-]
-
-// ── Icons ──
-
-function IconClinical({ accent }: { accent: string }) {
-  return (
-    <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none">
-      <path d="M20 54h14l7-20 12 38 8-24 6 6h13" stroke={accent} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="50" cy="50" r="38" stroke={accent} strokeWidth="1.2" opacity="0.28" />
-    </svg>
-  )
-}
-function IconSecurity({ accent }: { accent: string }) {
-  return (
-    <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none">
-      <path d="M50 16l28 10v20c0 21-12 36-28 42-16-6-28-21-28-42V26z" stroke={accent} strokeWidth="2.2" strokeLinejoin="round" />
-      <path d="M40 50l7 7 14-16" stroke={accent} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-function IconCustom({ accent }: { accent: string }) {
-  return (
-    <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none">
-      <circle cx="44" cy="44" r="24" stroke={accent} strokeWidth="2.2" />
-      <path d="M62 62l16 16" stroke={accent} strokeWidth="3" strokeLinecap="round" />
-      <path d="M44 34v20M34 44h20" stroke={accent} strokeWidth="1.8" strokeLinecap="round" opacity="0.55" />
-    </svg>
-  )
-}
-function IconResearch({ accent }: { accent: string }) {
-  return (
-    <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none">
-      <path d="M50 26c-6-5-14-7-24-6v46c10-1 18 1 24 6" stroke={accent} strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
-      <path d="M50 26c6-5 14-7 24-6v46c-10-1-18 1-24 6" stroke={accent} strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
-      <path d="M50 26v46" stroke={accent} strokeWidth="1.4" opacity="0.4" />
-    </svg>
-  )
-}
-
-const ICONS: Record<CharKey, (p: { accent: string }) => JSX.Element> = {
-  clinical: IconClinical,
-  security: IconSecurity,
-  custom: IconCustom,
-  research: IconResearch,
-}
-
-// ── Floating card ──
-
-function FloatingCard({ char, index, onSelect }: { char: CharDef; index: number; onSelect: (c: CharDef) => void }) {
-  const ref = useRef<HTMLButtonElement>(null)
-  const raf = useRef<number>()
-  const t0 = useRef(performance.now())
+function FloatingCard({ card, index }: { card: typeof CARDS[0]; index: number }) {
+  const [hovered, setHovered] = useState(false)
+  const [pos, setPos] = useState({ x: 0, y: 0 })
+  const [mounted, setMounted] = useState(false)
+  const rafRef = useRef<number>()
+  const timeRef = useRef(index * 1.3)
 
   useEffect(() => {
-    const phase = index * 1.9
-    const ampY = 6 + (index % 2) * 2.5
-    const speed = 0.00042 + index * 0.00004
-    const loop = (now: number) => {
-      const t = (now - t0.current) * speed + phase
-      const y = Math.sin(t) * ampY
-      if (ref.current) ref.current.style.transform = `translateY(${y}px)`
-      raf.current = requestAnimationFrame(loop)
+    setMounted(true)
+    const animate = () => {
+      timeRef.current += 0.008
+      const t = timeRef.current
+      const x = Math.sin(t + index * 1.2) * 6 + card.x * 2
+      const y = Math.cos(t * 0.8 + index * 0.9) * 5 + card.y * 2
+      setPos({ x, y })
+      rafRef.current = requestAnimationFrame(animate)
     }
-    raf.current = requestAnimationFrame(loop)
-    return () => { if (raf.current) cancelAnimationFrame(raf.current) }
-  }, [index])
+    rafRef.current = requestAnimationFrame(animate)
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
+  }, [])
 
-  return (
-    <button
-      ref={ref}
-      onClick={() => onSelect(char)}
-      aria-label={`Open ${char.label}`}
-      className="floatCard"
-      style={{
-        background: 'transparent', border: 'none', cursor: 'pointer', padding: 0,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.4rem',
-        opacity: 0, animation: `cardIn 0.8s cubic-bezier(0.16,1,0.3,1) forwards`,
-        animationDelay: `${0.2 + index * 0.1}s`,
-      }}
+  const isExternal = card.href.startsWith('http')
+
+  const cardStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    background: hovered ? '#111' : '#0a0a0a',
+    border: `1px solid ${hovered ? card.accent + '60' : 'rgba(255,255,255,0.07)'}`,
+    borderRadius: '16px',
+    padding: '2rem',
+    cursor: 'pointer',
+    textDecoration: 'none',
+    color: '#fff',
+    height: '280px',
+    transform: mounted
+      ? `translate(${pos.x}px, ${pos.y}px) rotate(${hovered ? 0 : card.rotate * 0.3}deg) scale(${hovered ? 1.03 : 1})`
+      : 'translate(0,0)',
+    transition: hovered
+      ? 'border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1)'
+      : 'border-color 0.2s, background 0.2s, box-shadow 0.2s',
+    boxShadow: hovered ? `0 24px 60px ${card.accent}20, 0 0 0 1px ${card.accent}20` : '0 8px 32px rgba(0,0,0,0.4)',
+    willChange: 'transform',
+    position: 'relative',
+    overflow: 'hidden',
+  }
+
+  const content = (
+    <div
+      style={cardStyle}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
-      <div
-        className="floatCardGlyph"
-        style={{
-          width: 'clamp(130px, 13vw, 172px)',
-          height: 'clamp(130px, 13vw, 172px)',
-          borderRadius: '32px',
-          border: '1px solid rgba(255,255,255,0.09)',
-          background: 'rgba(255,255,255,0.015)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          position: 'relative',
-          transition: 'border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, transform 0.3s cubic-bezier(0.16,1,0.3,1)',
-        }}
-      >
-        <div className="floatCardIcon" style={{ width: '54%', height: '54%', transition: 'transform 0.35s cubic-bezier(0.16,1,0.3,1)' }}>
-          {ICONS[char.key]({ accent: char.accent })}
-        </div>
-        <style>{`
-          .floatCard:hover .floatCardGlyph {
-            border-color: ${char.accent}66 !important;
-            box-shadow: 0 8px 32px ${char.accentGlow};
-            background: ${char.accentGlow};
-            transform: translateY(-3px);
-          }
-          .floatCard:hover .floatCardIcon {
-            transform: scale(1.14) rotate(-6deg);
-          }
-          .floatCard:active .floatCardIcon {
-            transform: scale(1.02) rotate(-2deg);
-          }
-          .floatCard:hover .floatCardLabel { color: #ffffff !important; }
-        `}</style>
-      </div>
-      <div style={{ textAlign: 'center' }}>
-        <p className="floatCardLabel" style={{
-          fontSize: '1rem', fontWeight: 500, color: 'rgba(255,255,255,0.82)',
-          letterSpacing: '-0.01em', marginBottom: '0.3rem', transition: 'color 0.25s ease',
+      {/* Glow blob */}
+      <div style={{
+        position: 'absolute', top: '-40px', right: '-40px',
+        width: '120px', height: '120px', borderRadius: '50%',
+        background: card.accent,
+        opacity: hovered ? 0.08 : 0.03,
+        filter: 'blur(40px)',
+        transition: 'opacity 0.3s',
+        pointerEvents: 'none',
+      }} />
+
+      {/* Top */}
+      <div>
+        <div style={{ fontSize: '1.8rem', marginBottom: '0.75rem' }}>{card.emoji}</div>
+        <h2 style={{
+          fontSize: 'clamp(1.6rem, 3.5vw, 2.2rem)',
+          fontWeight: 800, letterSpacing: '-0.04em',
+          lineHeight: 0.95, color: '#fff',
         }}>
-          {char.label}
-        </p>
+          {card.label}<br />
+          <span style={{ color: card.accent }}>{card.sublabel}</span>
+        </h2>
+      </div>
+
+      {/* Bottom */}
+      <div>
         <p style={{
-          fontSize: '0.72rem', fontFamily: 'var(--font-mono, monospace)',
-          color: 'rgba(255,255,255,0.32)', letterSpacing: '0.01em', maxWidth: '170px', lineHeight: 1.4,
+          fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)',
+          lineHeight: 1.55, marginBottom: '1rem', fontWeight: 300,
         }}>
-          {char.sub}
+          {card.desc}
         </p>
-      </div>
-    </button>
-  )
-}
-
-// ── Detail panel ──
-
-function DetailPanel({ char, onClose }: { char: CharDef; onClose: () => void }) {
-  const router = useRouter()
-  const isExternal = char.href.startsWith('http')
-  const go = () => { isExternal ? window.open(char.href, '_blank', 'noopener') : router.push(char.href) }
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
-
-  return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: '#000000', display: 'flex', animation: 'panelIn 0.35s cubic-bezier(0.16,1,0.3,1)' }}>
-      <button
-        onClick={onClose}
-        aria-label="Close"
-        style={{
-          position: 'absolute', top: '1.5rem', right: '1.75rem', zIndex: 5,
-          background: 'transparent', border: '1px solid rgba(255,255,255,0.14)',
-          borderRadius: '50%', width: '38px', height: '38px',
-          color: 'rgba(255,255,255,0.55)', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem',
-          transition: 'border-color 0.2s, color 0.2s',
-        }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = char.accent; e.currentTarget.style.color = '#fff' }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.14)'; e.currentTarget.style.color = 'rgba(255,255,255,0.55)' }}
-      >
-        ✕
-      </button>
-
-      <div style={{ flex: '0 0 42%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid rgba(255,255,255,0.06)', position: 'relative' }}>
         <div style={{
-          position: 'absolute', width: '46%', aspectRatio: '1', borderRadius: '50%',
-          background: `radial-gradient(circle, ${char.accentGlow}, transparent 72%)`, filter: 'blur(6px)',
-        }} />
-        <div style={{ width: 'min(30vw, 220px)', aspectRatio: '1', position: 'relative' }}>
-          {ICONS[char.key]({ accent: char.accent })}
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <span style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+            color: 'rgba(255,255,255,0.2)', letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+          }}>
+            {card.sub}
+          </span>
+          <span style={{
+            fontSize: '0.9rem', color: card.accent,
+            opacity: hovered ? 1 : 0,
+            transform: hovered ? 'translateX(0)' : 'translateX(-6px)',
+            transition: 'opacity 0.2s, transform 0.2s',
+          }}>→</span>
         </div>
-      </div>
-
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(2rem, 5vw, 5rem)', maxWidth: '640px' }}>
-        <span style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '0.75rem', color: char.accent, letterSpacing: '0.04em', marginBottom: '1rem', display: 'block' }}>
-          {char.sub}
-        </span>
-        <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 600, letterSpacing: '-0.03em', color: '#ffffff', lineHeight: 1.05, marginBottom: '1.5rem' }}>
-          {char.label}
-        </h1>
-        <p style={{ fontSize: '1rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.55)', marginBottom: '2.5rem' }}>
-          {char.desc}
-        </p>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem 2rem', marginBottom: '2.5rem' }}>
-          {char.meta.map(m => (
-            <div key={m.k}>
-              <p style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '0.68rem', color: 'rgba(255,255,255,0.3)', marginBottom: '0.25rem', letterSpacing: '0.03em' }}>
-                {m.k}
-              </p>
-              <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{m.v}</p>
-            </div>
-          ))}
-        </div>
-
-        <button
-          onClick={go}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '0.6rem',
-            background: char.accent, color: '#000000', border: 'none',
-            borderRadius: '999px', padding: '0.8rem 1.6rem', fontWeight: 600,
-            fontSize: '0.9rem', cursor: 'pointer', width: 'fit-content', transition: 'transform 0.15s ease',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translateX(4px)' }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'translateX(0)' }}
-        >
-          {isExternal ? 'Open repo' : 'Enter'} →
-        </button>
       </div>
     </div>
   )
+
+  if (isExternal) {
+    return <a href={card.href} target="_blank" rel="noopener" style={{ textDecoration: 'none', display: 'block' }}>{content}</a>
+  }
+  return <Link href={card.href} style={{ textDecoration: 'none', display: 'block' }}>{content}</Link>
 }
 
-// ── Page ──
-
 export default function HomePage() {
-  const [selected, setSelected] = useState<CharDef | null>(null)
   const [mounted, setMounted] = useState(false)
 
-  useEffect(() => { setMounted(true) }, [])
+  useEffect(() => {
+    setTimeout(() => setMounted(true), 100)
+  }, [])
 
   return (
-    <div style={{ background: '#000000', color: '#ffffff' }}>
+    <div style={{
+      background: '#000', color: '#fff', minHeight: '100vh',
+      fontFamily: 'var(--font-sans)',
+      display: 'flex', flexDirection: 'column',
+    }}>
+      {/* Nav */}
+      <nav style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+        padding: '0 2.5rem', height: '60px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        borderBottom: '1px solid rgba(255,255,255,0.05)',
+        background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(12px)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ color: '#f0a500', fontSize: '1rem' }}>◈</span>
+          <span style={{ fontWeight: 700, fontSize: '0.9rem', letterSpacing: '-0.01em' }}>ArgusAI</span>
+          <span style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
+            background: 'rgba(240,165,0,0.1)', color: '#f0a500',
+            border: '1px solid rgba(240,165,0,0.2)',
+            padding: '1px 6px', borderRadius: '4px', marginLeft: '0.25rem',
+          }}>v2.0</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <span style={{
+            width: '6px', height: '6px', borderRadius: '50%',
+            background: '#22c55e', display: 'inline-block',
+            animation: 'pulse-dot 2s ease-in-out infinite',
+          }} />
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'rgba(255,255,255,0.3)' }}>
+            live · WSAI 2026
+          </span>
+        </div>
+      </nav>
+
+      {/* Main content */}
+      <main style={{
+        flex: 1, display: 'flex', flexDirection: 'column',
+        justifyContent: 'center', padding: '6rem 2.5rem 3rem',
+        maxWidth: '1100px', margin: '0 auto', width: '100%',
+      }}>
+        {/* Top label */}
+        <div style={{
+          fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+          color: 'rgba(255,255,255,0.2)', letterSpacing: '0.14em',
+          textTransform: 'uppercase', marginBottom: '3rem',
+          opacity: mounted ? 1 : 0,
+          transform: mounted ? 'translateY(0)' : 'translateY(12px)',
+          transition: 'opacity 0.6s, transform 0.6s',
+        }}>
+          AI Safety · LLM Reasoning Oversight
+        </div>
+
+        {/* Headline */}
+        <h1 style={{
+          fontSize: 'clamp(2.8rem, 6vw, 5rem)',
+          fontWeight: 800, letterSpacing: '-0.04em',
+          lineHeight: 0.92, marginBottom: '4rem',
+          opacity: mounted ? 1 : 0,
+          transform: mounted ? 'translateY(0)' : 'translateY(20px)',
+          transition: 'opacity 0.7s 0.1s, transform 0.7s 0.1s',
+        }}>
+          Who watches<br />
+          <span style={{ color: 'rgba(255,255,255,0.15)' }}>the AI?</span>
+        </h1>
+
+        {/* Four floating cards */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '1rem',
+          opacity: mounted ? 1 : 0,
+          transform: mounted ? 'translateY(0)' : 'translateY(30px)',
+          transition: 'opacity 0.8s 0.25s, transform 0.8s 0.25s',
+        }}>
+          {CARDS.map((card, i) => (
+            <FloatingCard key={card.id} card={card} index={i} />
+          ))}
+        </div>
+
+        {/* Bottom line */}
+        <div style={{
+          marginTop: '3rem', display: 'flex', alignItems: 'center',
+          justifyContent: 'space-between',
+          opacity: mounted ? 1 : 0,
+          transition: 'opacity 0.8s 0.4s',
+        }}>
+          <p style={{
+            fontSize: '0.78rem', color: 'rgba(255,255,255,0.2)',
+            fontWeight: 300, maxWidth: '380px', lineHeight: 1.6,
+          }}>
+            ArgusAI catches when LLMs say one thing but reason another. Built for high-stakes domains — clinical diagnosis, code security, anything with real consequences.
+          </p>
+          <a href="https://github.com/gurinderpreetbrraich-cyber/argusai" target="_blank" rel="noopener"
+            style={{
+              fontFamily: 'var(--font-mono)', fontSize: '0.68rem',
+              color: 'rgba(255,255,255,0.2)', textDecoration: 'none',
+              transition: 'color 0.15s',
+            }}
+            onMouseEnter={e => (e.target as HTMLElement).style.color = '#fff'}
+            onMouseLeave={e => (e.target as HTMLElement).style.color = 'rgba(255,255,255,0.2)'}>
+            github →
+          </a>
+        </div>
+      </main>
+
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-
-        * { font-family: 'Space Grotesk', var(--font-sans, sans-serif); }
-        .mono-ui { font-family: 'JetBrains Mono', var(--font-mono, monospace) !important; }
-
-        html { scroll-behavior: smooth; }
-
-        @keyframes cardIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes panelIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
-
-        @media (max-width: 720px) {
-          .cardGrid { grid-template-columns: repeat(2, 1fr) !important; }
-          .stepsGrid { grid-template-columns: 1fr !important; }
+        @media (max-width: 900px) {
+          div[style*="repeat(4, 1fr)"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+        @media (max-width: 540px) {
+          div[style*="repeat(4, 1fr)"] {
+            grid-template-columns: 1fr !important;
+          }
         }
       `}</style>
-
-      {/* ── Hero ── */}
-      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)`,
-          backgroundSize: '56px 56px',
-          maskImage: 'radial-gradient(ellipse 65% 55% at 50% 45%, black 0%, transparent 75%)',
-        }} />
-
-        <nav style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.5rem 2rem',
-          position: 'relative', zIndex: 2, opacity: mounted ? 1 : 0,
-          animation: mounted ? 'fadeUp 0.5s ease forwards' : 'none',
-        }}>
-          <span style={{ fontWeight: 600, fontSize: '1.05rem', letterSpacing: '-0.01em' }}>
-            Argus<span style={{ color: '#f0a500' }}>AI</span>
-          </span>
-          <div className="mono-ui" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', display: 'inline-block', animation: 'pulse-dot 2s ease-in-out infinite' }} />
-            WSAI 2026
-          </div>
-        </nav>
-
-        <div style={{
-          flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          gap: 'clamp(3rem, 6vw, 5rem)', padding: '2rem', position: 'relative', zIndex: 2,
-        }}>
-          <div style={{ textAlign: 'center', maxWidth: '680px', opacity: mounted ? 1 : 0, animation: mounted ? 'fadeUp 0.6s ease 0.05s forwards' : 'none' }}>
-            <p className="mono-ui" style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.06em', marginBottom: '1.1rem', textTransform: 'uppercase' }}>
-              AI safety research
-            </p>
-            <h1 style={{ fontSize: 'clamp(2rem, 4.4vw, 3.2rem)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, color: 'rgba(255,255,255,0.96)', marginBottom: '1.1rem' }}>
-              The reasoning doesn\u2019t always agree with the conclusion.
-            </h1>
-            <p style={{ fontSize: 'clamp(0.95rem, 1.4vw, 1.05rem)', lineHeight: 1.65, color: 'rgba(255,255,255,0.45)', maxWidth: '540px', margin: '0 auto' }}>
-              ArgusAI audits large language model reasoning chains for the exact point where logic and verdict diverge \u2014 across clinical diagnosis, code review, and beyond.
-            </p>
-          </div>
-
-          <div className="cardGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(130px, 1fr))', gap: 'clamp(1.75rem, 4vw, 3.5rem)', maxWidth: '860px', width: '100%' }}>
-            {CHARACTERS.map((c, i) => (
-              <FloatingCard key={c.key} char={c} index={i} onSelect={setSelected} />
-            ))}
-          </div>
-        </div>
-
-        <a
-          href="#how-it-works"
-          className="mono-ui"
-          style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
-            padding: '0 0 2.5rem', color: 'rgba(255,255,255,0.35)', textDecoration: 'none',
-            fontSize: '0.68rem', letterSpacing: '0.05em', textTransform: 'uppercase',
-            position: 'relative', zIndex: 2, opacity: mounted ? 1 : 0,
-            animation: mounted ? 'fadeUp 0.6s ease 0.3s forwards' : 'none', alignSelf: 'center',
-          }}
-        >
-          how it works
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ animation: 'bounce 1.8s ease-in-out infinite' }}>
-            <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </a>
-      </section>
-
-      {/* ── How it works ── */}
-      <section id="how-it-works" style={{ padding: 'clamp(4rem, 10vw, 8rem) 2rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ maxWidth: '980px', margin: '0 auto' }}>
-          <p className="mono-ui" style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.06em', marginBottom: '1rem', textTransform: 'uppercase' }}>
-            the pipeline
-          </p>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.15, marginBottom: 'clamp(3rem, 7vw, 5rem)', maxWidth: '640px' }}>
-            Two passes, one question: does the reasoning support the conclusion it reaches?
-          </h2>
-
-          <div className="stepsGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '3rem' }}>
-            {STEPS.map((s, i) => (
-              <div key={s.n} style={{
-                borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem',
-                opacity: 0, animation: `fadeUp 0.6s ease ${0.1 * i}s forwards`,
-              }}>
-                <span className="mono-ui" style={{ fontSize: '0.78rem', color: '#f0a500', display: 'block', marginBottom: '1.25rem' }}>
-                  {s.n}
-                </span>
-                <h3 style={{ fontSize: '1.35rem', fontWeight: 500, letterSpacing: '-0.01em', marginBottom: '0.85rem' }}>
-                  {s.title}
-                </h3>
-                <p style={{ fontSize: '0.9rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.5)' }}>
-                  {s.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div style={{
-            marginTop: 'clamp(3.5rem, 7vw, 5.5rem)', paddingTop: '2.5rem',
-            borderTop: '1px solid rgba(255,255,255,0.06)',
-            display: 'flex', flexWrap: 'wrap', gap: '2.5rem', justifyContent: 'space-between',
-          }}>
-            {[
-              { v: '2', l: 'reasoning passes' },
-              { v: '10', l: 'test cases' },
-              { v: 'llama-3.3-70b', l: 'model' },
-              { v: 'Next.js 14', l: 'stack' },
-            ].map(stat => (
-              <div key={stat.l}>
-                <p className="mono-ui" style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.9)', marginBottom: '0.35rem' }}>{stat.v}</p>
-                <p className="mono-ui" style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.02em' }}>{stat.l}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {selected && <DetailPanel char={selected} onClose={() => setSelected(null)} />}
     </div>
   )
 }
