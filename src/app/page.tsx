@@ -78,37 +78,42 @@ const CHARACTERS: CharDef[] = [
   },
 ]
 
-// ── Icons — clean single-weight geometric glyphs, one per domain ──
+const STEPS = [
+  {
+    n: '01',
+    title: 'Reason',
+    desc: 'A case or prompt goes to Groq. The model reasons step by step toward a conclusion — a diagnosis, a merge decision, a verdict — and every step is captured, not just the final answer.',
+  },
+  {
+    n: '02',
+    title: 'Audit',
+    desc: 'A second pass reviews the reasoning chain against its own evidence. It scores faithfulness, flags contradictions, and marks exactly where the conclusion stopped following the logic.',
+  },
+  {
+    n: '03',
+    title: 'Probe',
+    desc: 'For every anomaly, ArgusAI generates a counterfactual question — the exact thing you\u2019d ask the model to expose where its reasoning actually broke.',
+  },
+]
+
+// ── Icons ──
 
 function IconClinical({ accent }: { accent: string }) {
   return (
     <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none">
-      <path
-        d="M20 54h14l7-20 12 38 8-24 6 6h13"
-        stroke={accent}
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M20 54h14l7-20 12 38 8-24 6 6h13" stroke={accent} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx="50" cy="50" r="38" stroke={accent} strokeWidth="1.2" opacity="0.28" />
     </svg>
   )
 }
-
 function IconSecurity({ accent }: { accent: string }) {
   return (
     <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none">
-      <path
-        d="M50 16l28 10v20c0 21-12 36-28 42-16-6-28-21-28-42V26z"
-        stroke={accent}
-        strokeWidth="2.2"
-        strokeLinejoin="round"
-      />
+      <path d="M50 16l28 10v20c0 21-12 36-28 42-16-6-28-21-28-42V26z" stroke={accent} strokeWidth="2.2" strokeLinejoin="round" />
       <path d="M40 50l7 7 14-16" stroke={accent} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
-
 function IconCustom({ accent }: { accent: string }) {
   return (
     <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none">
@@ -118,7 +123,6 @@ function IconCustom({ accent }: { accent: string }) {
     </svg>
   )
 }
-
 function IconResearch({ accent }: { accent: string }) {
   return (
     <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none">
@@ -138,15 +142,7 @@ const ICONS: Record<CharKey, (p: { accent: string }) => JSX.Element> = {
 
 // ── Floating card ──
 
-function FloatingCard({
-  char,
-  index,
-  onSelect,
-}: {
-  char: CharDef
-  index: number
-  onSelect: (c: CharDef) => void
-}) {
+function FloatingCard({ char, index, onSelect }: { char: CharDef; index: number; onSelect: (c: CharDef) => void }) {
   const ref = useRef<HTMLButtonElement>(null)
   const raf = useRef<number>()
   const t0 = useRef(performance.now())
@@ -155,13 +151,10 @@ function FloatingCard({
     const phase = index * 1.9
     const ampY = 6 + (index % 2) * 2.5
     const speed = 0.00042 + index * 0.00004
-
     const loop = (now: number) => {
       const t = (now - t0.current) * speed + phase
       const y = Math.sin(t) * ampY
-      if (ref.current) {
-        ref.current.style.transform = `translateY(${y}px)`
-      }
+      if (ref.current) ref.current.style.transform = `translateY(${y}px)`
       raf.current = requestAnimationFrame(loop)
     }
     raf.current = requestAnimationFrame(loop)
@@ -175,35 +168,26 @@ function FloatingCard({
       aria-label={`Open ${char.label}`}
       className="floatCard"
       style={{
-        background: 'transparent',
-        border: 'none',
-        cursor: 'pointer',
-        padding: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '1.25rem',
-        opacity: 0,
-        animation: `cardIn 0.8s cubic-bezier(0.16,1,0.3,1) forwards`,
+        background: 'transparent', border: 'none', cursor: 'pointer', padding: 0,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.4rem',
+        opacity: 0, animation: `cardIn 0.8s cubic-bezier(0.16,1,0.3,1) forwards`,
         animationDelay: `${0.2 + index * 0.1}s`,
       }}
     >
       <div
         className="floatCardGlyph"
         style={{
-          width: 'clamp(96px, 10vw, 128px)',
-          height: 'clamp(96px, 10vw, 128px)',
-          borderRadius: '28px',
+          width: 'clamp(130px, 13vw, 172px)',
+          height: 'clamp(130px, 13vw, 172px)',
+          borderRadius: '32px',
           border: '1px solid rgba(255,255,255,0.09)',
           background: 'rgba(255,255,255,0.015)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
           position: 'relative',
           transition: 'border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, transform 0.3s cubic-bezier(0.16,1,0.3,1)',
         }}
       >
-        <div style={{ width: '42%', height: '42%' }}>
+        <div style={{ width: '54%', height: '54%' }}>
           {ICONS[char.key]({ accent: char.accent })}
         </div>
         <style>{`
@@ -218,13 +202,13 @@ function FloatingCard({
       </div>
       <div style={{ textAlign: 'center' }}>
         <p className="floatCardLabel" style={{
-          fontSize: '0.92rem', fontWeight: 600, color: 'rgba(255,255,255,0.82)',
+          fontSize: '1rem', fontWeight: 500, color: 'rgba(255,255,255,0.82)',
           letterSpacing: '-0.01em', marginBottom: '0.3rem', transition: 'color 0.25s ease',
         }}>
           {char.label}
         </p>
         <p style={{
-          fontSize: '0.72rem', fontFamily: 'var(--font-mono, monospace)',
+          fontSize: '0.74rem', fontFamily: 'var(--font-mono, monospace)',
           color: 'rgba(255,255,255,0.32)', letterSpacing: '0.01em',
         }}>
           {char.sub}
@@ -239,11 +223,7 @@ function FloatingCard({
 function DetailPanel({ char, onClose }: { char: CharDef; onClose: () => void }) {
   const router = useRouter()
   const isExternal = char.href.startsWith('http')
-
-  const go = () => {
-    if (isExternal) window.open(char.href, '_blank', 'noopener')
-    else router.push(char.href)
-  }
+  const go = () => { isExternal ? window.open(char.href, '_blank', 'noopener') : router.push(char.href) }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -252,14 +232,7 @@ function DetailPanel({ char, onClose }: { char: CharDef; onClose: () => void }) 
   }, [onClose])
 
   return (
-    <div
-      style={{
-        position: 'fixed', inset: 0, zIndex: 200,
-        background: '#000000',
-        display: 'flex',
-        animation: 'panelIn 0.35s cubic-bezier(0.16,1,0.3,1)',
-      }}
-    >
+    <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: '#000000', display: 'flex', animation: 'panelIn 0.35s cubic-bezier(0.16,1,0.3,1)' }}>
       <button
         onClick={onClose}
         aria-label="Close"
@@ -268,8 +241,7 @@ function DetailPanel({ char, onClose }: { char: CharDef; onClose: () => void }) 
           background: 'transparent', border: '1px solid rgba(255,255,255,0.14)',
           borderRadius: '50%', width: '38px', height: '38px',
           color: 'rgba(255,255,255,0.55)', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '0.85rem',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem',
           transition: 'border-color 0.2s, color 0.2s',
         }}
         onMouseEnter={e => { e.currentTarget.style.borderColor = char.accent; e.currentTarget.style.color = '#fff' }}
@@ -278,56 +250,34 @@ function DetailPanel({ char, onClose }: { char: CharDef; onClose: () => void }) 
         ✕
       </button>
 
-      <div style={{
-        flex: '0 0 42%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        borderRight: '1px solid rgba(255,255,255,0.06)', position: 'relative',
-      }}>
+      <div style={{ flex: '0 0 42%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid rgba(255,255,255,0.06)', position: 'relative' }}>
         <div style={{
           position: 'absolute', width: '46%', aspectRatio: '1', borderRadius: '50%',
-          background: `radial-gradient(circle, ${char.accentGlow}, transparent 72%)`,
-          filter: 'blur(6px)',
+          background: `radial-gradient(circle, ${char.accentGlow}, transparent 72%)`, filter: 'blur(6px)',
         }} />
-        <div style={{ width: 'min(28vw, 200px)', aspectRatio: '1', position: 'relative' }}>
+        <div style={{ width: 'min(30vw, 220px)', aspectRatio: '1', position: 'relative' }}>
           {ICONS[char.key]({ accent: char.accent })}
         </div>
       </div>
 
-      <div style={{
-        flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        padding: 'clamp(2rem, 5vw, 5rem)', maxWidth: '640px',
-      }}>
-        <span style={{
-          fontFamily: 'var(--font-mono, monospace)', fontSize: '0.75rem',
-          color: char.accent, letterSpacing: '0.04em', marginBottom: '1rem', display: 'block',
-        }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(2rem, 5vw, 5rem)', maxWidth: '640px' }}>
+        <span style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '0.75rem', color: char.accent, letterSpacing: '0.04em', marginBottom: '1rem', display: 'block' }}>
           {char.sub}
         </span>
-        <h1 style={{
-          fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, letterSpacing: '-0.03em',
-          color: '#ffffff', lineHeight: 1.05, marginBottom: '1.5rem',
-        }}>
+        <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 600, letterSpacing: '-0.03em', color: '#ffffff', lineHeight: 1.05, marginBottom: '1.5rem' }}>
           {char.label}
         </h1>
-        <p style={{
-          fontSize: '1rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.55)', marginBottom: '2.5rem',
-        }}>
+        <p style={{ fontSize: '1rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.55)', marginBottom: '2.5rem' }}>
           {char.desc}
         </p>
 
-        <div style={{
-          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem 2rem', marginBottom: '2.5rem',
-        }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem 2rem', marginBottom: '2.5rem' }}>
           {char.meta.map(m => (
             <div key={m.k}>
-              <p style={{
-                fontFamily: 'var(--font-mono, monospace)', fontSize: '0.68rem',
-                color: 'rgba(255,255,255,0.3)', marginBottom: '0.25rem', letterSpacing: '0.03em',
-              }}>
+              <p style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '0.68rem', color: 'rgba(255,255,255,0.3)', marginBottom: '0.25rem', letterSpacing: '0.03em' }}>
                 {m.k}
               </p>
-              <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>
-                {m.v}
-              </p>
+              <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{m.v}</p>
             </div>
           ))}
         </div>
@@ -337,9 +287,8 @@ function DetailPanel({ char, onClose }: { char: CharDef; onClose: () => void }) 
           style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.6rem',
             background: char.accent, color: '#000000', border: 'none',
-            borderRadius: '999px', padding: '0.8rem 1.6rem', fontWeight: 700,
-            fontSize: '0.9rem', cursor: 'pointer', width: 'fit-content',
-            transition: 'transform 0.15s ease',
+            borderRadius: '999px', padding: '0.8rem 1.6rem', fontWeight: 600,
+            fontSize: '0.9rem', cursor: 'pointer', width: 'fit-content', transition: 'transform 0.15s ease',
           }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'translateX(4px)' }}
           onMouseLeave={e => { e.currentTarget.style.transform = 'translateX(0)' }}
@@ -360,93 +309,135 @@ export default function HomePage() {
   useEffect(() => { setMounted(true) }, [])
 
   return (
-    <div style={{
-      minHeight: '100vh', background: '#000000', color: '#ffffff',
-      display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden',
-    }}>
+    <div style={{ background: '#000000', color: '#ffffff' }}>
       <style>{`
-        @keyframes cardIn {
-          from { opacity: 0; transform: translateY(14px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes panelIn {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(8px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        backgroundImage: `
-          linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
-        `,
-        backgroundSize: '56px 56px',
-        maskImage: 'radial-gradient(ellipse 65% 55% at 50% 45%, black 0%, transparent 75%)',
-      }} />
+        * { font-family: 'Space Grotesk', var(--font-sans, sans-serif); }
+        .mono-ui { font-family: 'JetBrains Mono', var(--font-mono, monospace) !important; }
 
-      <nav style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '1.5rem 2rem', position: 'relative', zIndex: 2,
-        opacity: mounted ? 1 : 0, animation: mounted ? 'fadeUp 0.5s ease forwards' : 'none',
-      }}>
-        <span style={{ fontWeight: 700, fontSize: '0.95rem', letterSpacing: '-0.01em' }}>
-          Argus<span style={{ color: '#f0a500' }}>AI</span>
-        </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.72rem', fontFamily: 'var(--font-mono, monospace)', color: 'rgba(255,255,255,0.4)' }}>
-          <span style={{
-            width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e',
-            display: 'inline-block', animation: 'pulse-dot 2s ease-in-out infinite',
-          }} />
-          WSAI 2026
-        </div>
-      </nav>
+        html { scroll-behavior: smooth; }
 
-      <div style={{
-        flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
-        justifyContent: 'center', gap: 'clamp(3rem, 6vw, 5rem)', padding: '2rem',
-        position: 'relative', zIndex: 2,
-      }}>
-        <div style={{
-          textAlign: 'center', opacity: mounted ? 1 : 0,
-          animation: mounted ? 'fadeUp 0.6s ease 0.05s forwards' : 'none',
-        }}>
-          <p style={{
-            fontFamily: 'var(--font-mono, monospace)', fontSize: '0.72rem',
-            color: 'rgba(255,255,255,0.35)', letterSpacing: '0.06em', marginBottom: '0.9rem',
-            textTransform: 'uppercase',
-          }}>
-            LLM reasoning oversight
-          </p>
-          <h1 style={{
-            fontSize: 'clamp(1.7rem, 3.4vw, 2.5rem)', fontWeight: 600,
-            letterSpacing: '-0.03em', lineHeight: 1.15, color: 'rgba(255,255,255,0.94)',
-          }}>
-            Choose what ArgusAI audits
-          </h1>
-        </div>
+        @keyframes cardIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes panelIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 
-        <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(4, minmax(120px, 1fr))',
-          gap: 'clamp(1.75rem, 4vw, 3.5rem)', maxWidth: '760px', width: '100%',
-        }} className="cardGrid">
-          {CHARACTERS.map((c, i) => (
-            <FloatingCard key={c.key} char={c} index={i} onSelect={setSelected} />
-          ))}
-        </div>
-      </div>
-
-      <div style={{ height: '2.5rem' }} />
-
-      <style>{`
         @media (max-width: 720px) {
           .cardGrid { grid-template-columns: repeat(2, 1fr) !important; }
+          .stepsGrid { grid-template-columns: 1fr !important; }
         }
       `}</style>
+
+      {/* ── Hero ── */}
+      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)`,
+          backgroundSize: '56px 56px',
+          maskImage: 'radial-gradient(ellipse 65% 55% at 50% 45%, black 0%, transparent 75%)',
+        }} />
+
+        <nav style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.5rem 2rem',
+          position: 'relative', zIndex: 2, opacity: mounted ? 1 : 0,
+          animation: mounted ? 'fadeUp 0.5s ease forwards' : 'none',
+        }}>
+          <span style={{ fontWeight: 600, fontSize: '1.05rem', letterSpacing: '-0.01em' }}>
+            Argus<span style={{ color: '#f0a500' }}>AI</span>
+          </span>
+          <div className="mono-ui" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', display: 'inline-block', animation: 'pulse-dot 2s ease-in-out infinite' }} />
+            WSAI 2026
+          </div>
+        </nav>
+
+        <div style={{
+          flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          gap: 'clamp(3rem, 6vw, 5rem)', padding: '2rem', position: 'relative', zIndex: 2,
+        }}>
+          <div style={{ textAlign: 'center', opacity: mounted ? 1 : 0, animation: mounted ? 'fadeUp 0.6s ease 0.05s forwards' : 'none' }}>
+            <p className="mono-ui" style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.06em', marginBottom: '0.9rem', textTransform: 'uppercase' }}>
+              LLM reasoning oversight
+            </p>
+            <h1 style={{ fontSize: 'clamp(1.9rem, 3.8vw, 2.8rem)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.15, color: 'rgba(255,255,255,0.94)' }}>
+              Choose what ArgusAI audits
+            </h1>
+          </div>
+
+          <div className="cardGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(130px, 1fr))', gap: 'clamp(1.75rem, 4vw, 3.5rem)', maxWidth: '860px', width: '100%' }}>
+            {CHARACTERS.map((c, i) => (
+              <FloatingCard key={c.key} char={c} index={i} onSelect={setSelected} />
+            ))}
+          </div>
+        </div>
+
+        <a
+          href="#how-it-works"
+          className="mono-ui"
+          style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
+            padding: '0 0 2.5rem', color: 'rgba(255,255,255,0.35)', textDecoration: 'none',
+            fontSize: '0.68rem', letterSpacing: '0.05em', textTransform: 'uppercase',
+            position: 'relative', zIndex: 2, opacity: mounted ? 1 : 0,
+            animation: mounted ? 'fadeUp 0.6s ease 0.3s forwards' : 'none', alignSelf: 'center',
+          }}
+        >
+          how it works
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ animation: 'bounce 1.8s ease-in-out infinite' }}>
+            <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </a>
+      </section>
+
+      {/* ── How it works ── */}
+      <section id="how-it-works" style={{ padding: 'clamp(4rem, 10vw, 8rem) 2rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ maxWidth: '980px', margin: '0 auto' }}>
+          <p className="mono-ui" style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.06em', marginBottom: '1rem', textTransform: 'uppercase' }}>
+            how it works
+          </p>
+          <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.15, marginBottom: 'clamp(3rem, 7vw, 5rem)', maxWidth: '620px' }}>
+            Two passes. One question — does the reasoning actually support the answer?
+          </h2>
+
+          <div className="stepsGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '3rem' }}>
+            {STEPS.map((s, i) => (
+              <div key={s.n} style={{
+                borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem',
+                opacity: 0, animation: `fadeUp 0.6s ease ${0.1 * i}s forwards`,
+              }}>
+                <span className="mono-ui" style={{ fontSize: '0.78rem', color: '#f0a500', display: 'block', marginBottom: '1.25rem' }}>
+                  {s.n}
+                </span>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 500, letterSpacing: '-0.01em', marginBottom: '0.85rem' }}>
+                  {s.title}
+                </h3>
+                <p style={{ fontSize: '0.9rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.5)' }}>
+                  {s.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div style={{
+            marginTop: 'clamp(3.5rem, 7vw, 5.5rem)', paddingTop: '2.5rem',
+            borderTop: '1px solid rgba(255,255,255,0.06)',
+            display: 'flex', flexWrap: 'wrap', gap: '2.5rem', justifyContent: 'space-between',
+          }}>
+            {[
+              { v: '2', l: 'reasoning passes' },
+              { v: '10', l: 'test cases' },
+              { v: 'llama-3.3-70b', l: 'model' },
+              { v: 'Next.js 14', l: 'stack' },
+            ].map(stat => (
+              <div key={stat.l}>
+                <p className="mono-ui" style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.9)', marginBottom: '0.35rem' }}>{stat.v}</p>
+                <p className="mono-ui" style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.02em' }}>{stat.l}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {selected && <DetailPanel char={selected} onClose={() => setSelected(null)} />}
     </div>
