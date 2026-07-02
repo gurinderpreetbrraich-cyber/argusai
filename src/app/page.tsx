@@ -21,9 +21,9 @@ const CHARACTERS: CharDef[] = [
     accent: '#f0a500',
     accentGlow: 'rgba(240,165,0,0.16)',
     label: 'Clinical',
-    sub: 'diagnosis vs. ground truth',
+    sub: 'diagnosis versus objective data',
     href: '/dashboard?domain=clinical',
-    desc: 'Five cases built on real wearable telemetry. Case 5 is adversarial on purpose \u2014 SpO\u2082 82%, AHI 52, patient vibes: \u201cI feel fine.\u201d Watch the model pick a side.',
+    desc: 'Five cases built on real wearable telemetry. Case 5 is adversarial by design \u2014 SpO\u2082 minimum 71%, AHI 52, and a patient who insists nothing is wrong. ArgusAI evaluates whether the diagnosis follows the data or the narrative.',
     meta: [
       { k: 'domain', v: 'sleep medicine' },
       { k: 'cases', v: '5' },
@@ -36,9 +36,9 @@ const CHARACTERS: CharDef[] = [
     accent: '#ef4444',
     accentGlow: 'rgba(239,68,68,0.16)',
     label: 'Code security',
-    sub: 'found, then quietly un-found',
+    sub: 'a vulnerability, identified then dismissed',
     href: '/dashboard?domain=security',
-    desc: 'The model spots the SQL injection in its own reasoning trace \u2014 then un-spots it the moment someone says \u201cCTO approved, ship it.\u201d A textbook faithfulness collapse.',
+    desc: 'The model identifies a SQL injection vulnerability in its own reasoning, then reverses its recommendation under social and time pressure \u2014 a clear instance of reasoning that doesn\u2019t survive contact with framing.',
     meta: [
       { k: 'domain', v: 'code review' },
       { k: 'cases', v: '5' },
@@ -51,9 +51,9 @@ const CHARACTERS: CharDef[] = [
     accent: '#a855f7',
     accentGlow: 'rgba(168,85,247,0.16)',
     label: 'Custom prompt',
-    sub: 'bring your own chain-of-thought',
+    sub: 'analyze any reasoning chain',
     href: '/custom',
-    desc: 'Paste a diagnosis, a diff, an argument \u2014 anything with a verdict attached. Domain auto-detected, reasoning audited, zero config.',
+    desc: 'Paste a diagnosis, a code review, an argument \u2014 anything with a stated conclusion. ArgusAI detects the domain automatically and audits the reasoning behind it.',
     meta: [
       { k: 'domain', v: 'auto-detected' },
       { k: 'input', v: 'any prompt' },
@@ -66,9 +66,9 @@ const CHARACTERS: CharDef[] = [
     accent: '#22c55e',
     accentGlow: 'rgba(34,197,94,0.16)',
     label: 'Research',
-    sub: 'the paper behind the panic',
+    sub: 'the study behind the system',
     href: 'https://github.com/gurinderpreetbrraich-cyber/argusai',
-    desc: 'Over half of \u201ccorrect\u201d LLM answers on complex tasks hide broken reasoning underneath (ProcessBench, 2025). This is the WSAI 2026 submission built to prove it, one adversarial case at a time.',
+    desc: 'More than half of correct LLM answers on complex tasks conceal flawed reasoning underneath (ProcessBench, 2025). This is a WSAI 2026 submission built to make that failure mode visible and measurable.',
     meta: [
       { k: 'target', v: 'WSAI 2026' },
       { k: 'track', v: 'AI safety' },
@@ -82,17 +82,17 @@ const STEPS = [
   {
     n: '01',
     title: 'Reason',
-    desc: 'Groq\u2019s llama-3.3-70b thinks out loud, one step at a time. Every claim, hedge, and vibe-based leap gets logged \u2014 not just the final take.',
+    desc: 'The model reasons through the case step by step using Groq\u2019s llama-3.3-70b, and every step of that process is recorded \u2014 not only the final answer.',
   },
   {
     n: '02',
     title: 'Audit',
-    desc: 'A second pass cross-examines the first: faithfulness score, contradiction detection, evidence gaps. A peer reviewer that never gets tired and never gets bribed.',
+    desc: 'A second pass reviews the first for faithfulness: does each step support the next, and does the conclusion actually follow from the evidence presented?',
   },
   {
     n: '03',
     title: 'Probe',
-    desc: 'For every anomaly, ArgusAI writes the counterfactual question that would expose it \u2014 the \u201cwait, actually\u2014\u201d moment, automated.',
+    desc: 'For each anomaly detected, ArgusAI generates a counterfactual question designed to test whether the reasoning would hold up under scrutiny.',
   },
 ]
 
@@ -187,7 +187,7 @@ function FloatingCard({ char, index, onSelect }: { char: CharDef; index: number;
           transition: 'border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, transform 0.3s cubic-bezier(0.16,1,0.3,1)',
         }}
       >
-        <div style={{ width: '54%', height: '54%' }}>
+        <div className="floatCardIcon" style={{ width: '54%', height: '54%', transition: 'transform 0.35s cubic-bezier(0.16,1,0.3,1)' }}>
           {ICONS[char.key]({ accent: char.accent })}
         </div>
         <style>{`
@@ -196,6 +196,12 @@ function FloatingCard({ char, index, onSelect }: { char: CharDef; index: number;
             box-shadow: 0 8px 32px ${char.accentGlow};
             background: ${char.accentGlow};
             transform: translateY(-3px);
+          }
+          .floatCard:hover .floatCardIcon {
+            transform: scale(1.14) rotate(-6deg);
+          }
+          .floatCard:active .floatCardIcon {
+            transform: scale(1.02) rotate(-2deg);
           }
           .floatCard:hover .floatCardLabel { color: #ffffff !important; }
         `}</style>
@@ -209,7 +215,7 @@ function FloatingCard({ char, index, onSelect }: { char: CharDef; index: number;
         </p>
         <p style={{
           fontSize: '0.72rem', fontFamily: 'var(--font-mono, monospace)',
-          color: 'rgba(255,255,255,0.32)', letterSpacing: '0.01em', maxWidth: '160px', lineHeight: 1.4,
+          color: 'rgba(255,255,255,0.32)', letterSpacing: '0.01em', maxWidth: '170px', lineHeight: 1.4,
         }}>
           {char.sub}
         </p>
@@ -358,13 +364,13 @@ export default function HomePage() {
         }}>
           <div style={{ textAlign: 'center', maxWidth: '680px', opacity: mounted ? 1 : 0, animation: mounted ? 'fadeUp 0.6s ease 0.05s forwards' : 'none' }}>
             <p className="mono-ui" style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.06em', marginBottom: '1.1rem', textTransform: 'uppercase' }}>
-              faithfulness research, not vibes
+              AI safety research
             </p>
             <h1 style={{ fontSize: 'clamp(2rem, 4.4vw, 3.2rem)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, color: 'rgba(255,255,255,0.96)', marginBottom: '1.1rem' }}>
-              Your LLM is gaslighting itself.
+              The reasoning doesn\u2019t always agree with the conclusion.
             </h1>
-            <p style={{ fontSize: 'clamp(0.95rem, 1.4vw, 1.05rem)', lineHeight: 1.65, color: 'rgba(255,255,255,0.45)', maxWidth: '520px', margin: '0 auto' }}>
-              ArgusAI reads the reasoning, not just the answer \u2014 and flags the exact step where the logic and the verdict stop agreeing.
+            <p style={{ fontSize: 'clamp(0.95rem, 1.4vw, 1.05rem)', lineHeight: 1.65, color: 'rgba(255,255,255,0.45)', maxWidth: '540px', margin: '0 auto' }}>
+              ArgusAI audits large language model reasoning chains for the exact point where logic and verdict diverge \u2014 across clinical diagnosis, code review, and beyond.
             </p>
           </div>
 
@@ -386,7 +392,7 @@ export default function HomePage() {
             animation: mounted ? 'fadeUp 0.6s ease 0.3s forwards' : 'none', alignSelf: 'center',
           }}
         >
-          the mechanism
+          how it works
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ animation: 'bounce 1.8s ease-in-out infinite' }}>
             <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -400,7 +406,7 @@ export default function HomePage() {
             the pipeline
           </p>
           <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.15, marginBottom: 'clamp(3rem, 7vw, 5rem)', maxWidth: '640px' }}>
-            Two passes. One unresolved question: does the logic actually reach the conclusion, or just gesture at it?
+            Two passes, one question: does the reasoning support the conclusion it reaches?
           </h2>
 
           <div className="stepsGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '3rem' }}>
