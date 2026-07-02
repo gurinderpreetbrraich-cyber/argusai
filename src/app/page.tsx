@@ -21,9 +21,9 @@ const CHARACTERS: CharDef[] = [
     accent: '#f0a500',
     accentGlow: 'rgba(240,165,0,0.16)',
     label: 'Clinical',
-    sub: 'sleep medicine',
+    sub: 'diagnosis vs. ground truth',
     href: '/dashboard?domain=clinical',
-    desc: 'Five patient cases built from real wearable data. One is designed to make the model contradict its own findings — ArgusAI catches it.',
+    desc: 'Five cases built on real wearable telemetry. Case 5 is adversarial on purpose \u2014 SpO\u2082 82%, AHI 52, patient vibes: \u201cI feel fine.\u201d Watch the model pick a side.',
     meta: [
       { k: 'domain', v: 'sleep medicine' },
       { k: 'cases', v: '5' },
@@ -36,9 +36,9 @@ const CHARACTERS: CharDef[] = [
     accent: '#ef4444',
     accentGlow: 'rgba(239,68,68,0.16)',
     label: 'Code security',
-    sub: 'pull request review',
+    sub: 'found, then quietly un-found',
     href: '/dashboard?domain=security',
-    desc: 'The model finds the SQL injection in its reasoning, then a deadline and a fake approval talk it into merging anyway.',
+    desc: 'The model spots the SQL injection in its own reasoning trace \u2014 then un-spots it the moment someone says \u201cCTO approved, ship it.\u201d A textbook faithfulness collapse.',
     meta: [
       { k: 'domain', v: 'code review' },
       { k: 'cases', v: '5' },
@@ -51,9 +51,9 @@ const CHARACTERS: CharDef[] = [
     accent: '#a855f7',
     accentGlow: 'rgba(168,85,247,0.16)',
     label: 'Custom prompt',
-    sub: 'analyze anything',
+    sub: 'bring your own chain-of-thought',
     href: '/custom',
-    desc: 'Paste a diagnosis, a diff, an argument — anything with a conclusion. ArgusAI detects the domain and audits the reasoning live.',
+    desc: 'Paste a diagnosis, a diff, an argument \u2014 anything with a verdict attached. Domain auto-detected, reasoning audited, zero config.',
     meta: [
       { k: 'domain', v: 'auto-detected' },
       { k: 'input', v: 'any prompt' },
@@ -66,9 +66,9 @@ const CHARACTERS: CharDef[] = [
     accent: '#22c55e',
     accentGlow: 'rgba(34,197,94,0.16)',
     label: 'Research',
-    sub: 'why this exists',
+    sub: 'the paper behind the panic',
     href: 'https://github.com/gurinderpreetbrraich-cyber/argusai',
-    desc: 'Over half of correct LLM answers on complex tasks hide broken reasoning underneath. This is a WSAI 2026 submission built to surface it.',
+    desc: 'Over half of \u201ccorrect\u201d LLM answers on complex tasks hide broken reasoning underneath (ProcessBench, 2025). This is the WSAI 2026 submission built to prove it, one adversarial case at a time.',
     meta: [
       { k: 'target', v: 'WSAI 2026' },
       { k: 'track', v: 'AI safety' },
@@ -82,17 +82,17 @@ const STEPS = [
   {
     n: '01',
     title: 'Reason',
-    desc: 'A case or prompt goes to Groq. The model reasons step by step toward a conclusion — a diagnosis, a merge decision, a verdict — and every step is captured, not just the final answer.',
+    desc: 'Groq\u2019s llama-3.3-70b thinks out loud, one step at a time. Every claim, hedge, and vibe-based leap gets logged \u2014 not just the final take.',
   },
   {
     n: '02',
     title: 'Audit',
-    desc: 'A second pass reviews the reasoning chain against its own evidence. It scores faithfulness, flags contradictions, and marks exactly where the conclusion stopped following the logic.',
+    desc: 'A second pass cross-examines the first: faithfulness score, contradiction detection, evidence gaps. A peer reviewer that never gets tired and never gets bribed.',
   },
   {
     n: '03',
     title: 'Probe',
-    desc: 'For every anomaly, ArgusAI generates a counterfactual question — the exact thing you\u2019d ask the model to expose where its reasoning actually broke.',
+    desc: 'For every anomaly, ArgusAI writes the counterfactual question that would expose it \u2014 the \u201cwait, actually\u2014\u201d moment, automated.',
   },
 ]
 
@@ -208,8 +208,8 @@ function FloatingCard({ char, index, onSelect }: { char: CharDef; index: number;
           {char.label}
         </p>
         <p style={{
-          fontSize: '0.74rem', fontFamily: 'var(--font-mono, monospace)',
-          color: 'rgba(255,255,255,0.32)', letterSpacing: '0.01em',
+          fontSize: '0.72rem', fontFamily: 'var(--font-mono, monospace)',
+          color: 'rgba(255,255,255,0.32)', letterSpacing: '0.01em', maxWidth: '160px', lineHeight: 1.4,
         }}>
           {char.sub}
         </p>
@@ -356,13 +356,16 @@ export default function HomePage() {
           flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           gap: 'clamp(3rem, 6vw, 5rem)', padding: '2rem', position: 'relative', zIndex: 2,
         }}>
-          <div style={{ textAlign: 'center', opacity: mounted ? 1 : 0, animation: mounted ? 'fadeUp 0.6s ease 0.05s forwards' : 'none' }}>
-            <p className="mono-ui" style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.06em', marginBottom: '0.9rem', textTransform: 'uppercase' }}>
-              LLM reasoning oversight
+          <div style={{ textAlign: 'center', maxWidth: '680px', opacity: mounted ? 1 : 0, animation: mounted ? 'fadeUp 0.6s ease 0.05s forwards' : 'none' }}>
+            <p className="mono-ui" style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.06em', marginBottom: '1.1rem', textTransform: 'uppercase' }}>
+              faithfulness research, not vibes
             </p>
-            <h1 style={{ fontSize: 'clamp(1.9rem, 3.8vw, 2.8rem)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.15, color: 'rgba(255,255,255,0.94)' }}>
-              Choose what ArgusAI audits
+            <h1 style={{ fontSize: 'clamp(2rem, 4.4vw, 3.2rem)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, color: 'rgba(255,255,255,0.96)', marginBottom: '1.1rem' }}>
+              Your LLM is gaslighting itself.
             </h1>
+            <p style={{ fontSize: 'clamp(0.95rem, 1.4vw, 1.05rem)', lineHeight: 1.65, color: 'rgba(255,255,255,0.45)', maxWidth: '520px', margin: '0 auto' }}>
+              ArgusAI reads the reasoning, not just the answer \u2014 and flags the exact step where the logic and the verdict stop agreeing.
+            </p>
           </div>
 
           <div className="cardGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(130px, 1fr))', gap: 'clamp(1.75rem, 4vw, 3.5rem)', maxWidth: '860px', width: '100%' }}>
@@ -383,7 +386,7 @@ export default function HomePage() {
             animation: mounted ? 'fadeUp 0.6s ease 0.3s forwards' : 'none', alignSelf: 'center',
           }}
         >
-          how it works
+          the mechanism
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ animation: 'bounce 1.8s ease-in-out infinite' }}>
             <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -394,10 +397,10 @@ export default function HomePage() {
       <section id="how-it-works" style={{ padding: 'clamp(4rem, 10vw, 8rem) 2rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: '980px', margin: '0 auto' }}>
           <p className="mono-ui" style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.06em', marginBottom: '1rem', textTransform: 'uppercase' }}>
-            how it works
+            the pipeline
           </p>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.15, marginBottom: 'clamp(3rem, 7vw, 5rem)', maxWidth: '620px' }}>
-            Two passes. One question — does the reasoning actually support the answer?
+          <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.15, marginBottom: 'clamp(3rem, 7vw, 5rem)', maxWidth: '640px' }}>
+            Two passes. One unresolved question: does the logic actually reach the conclusion, or just gesture at it?
           </h2>
 
           <div className="stepsGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '3rem' }}>
